@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "pre",
+  "version": "${version}",
+
+  "name": "PythonCraftRE",
+  "description": "The runtime environment of PythonCraft, a new generation Minecraft modding API.",
+  "authors": [
+    "kworker"
+  ],
+  "contact": {
+    "homepage": "https://frankyang6921.github.io/",
+    "sources": "https://github.com/FrankYang6921/pythoncraft-env"
+  },
+
+  "license": "GPLv3",
+  "icon": "assets/pre/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "top.frankyang.pre.Main"
+    ]
+  },
+  "mixins": [
+    "pre.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.x.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
