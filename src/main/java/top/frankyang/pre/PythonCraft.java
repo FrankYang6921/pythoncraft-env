@@ -7,7 +7,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import top.frankyang.pre.context.StandaloneProvider;
+import top.frankyang.pre.interact.PackagedProvider;
+import top.frankyang.pre.interact.StandaloneProvider;
 import top.frankyang.pre.loader.Package;
 import top.frankyang.pre.loader.Packages;
 import top.frankyang.pre.misc.FileOnlyVisitor;
@@ -20,7 +21,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
@@ -95,7 +96,10 @@ public class PythonCraft implements ModInitializer {
                     argument("path", string()).executes(context -> {
                         String path = getString(context, "path");
                         PYTHON_THREAD_POOL.submit(
-                            python -> python.execfile(path), new StandaloneProvider(context, path)
+                            p -> p.execfile(path),
+                            new StandaloneProvider(
+                                context, path
+                            )
                         );
                         return 1;
                     })
@@ -105,30 +109,61 @@ public class PythonCraft implements ModInitializer {
     }
 
     private static void loadPackages() throws IOException {
-        List<Path> packages = new LinkedList<>();
+        List<Path> paths = new ArrayList<>();
 
         Files.walkFileTree(
             Paths.get(HOME_DIR, "scripts"),
-            (FileOnlyVisitor<Path>) packages::add
+            (FileOnlyVisitor<Path>) paths::add
         );
 
-        for (Path packagePath : packages) {
-            LOGGER.info("正在加载这个PythonCraft包：" + packagePath);
+        List<Future<?>> futures = new LinkedList<>();
 
+        for (Path path : paths) {
             Package pkg;
+
             try {
-                pkg = Packages.get(packagePath.toAbsolutePath().toString());
+                pkg = Packages.get(path.toAbsolutePath().toString());
             } catch (Exception e) {
-                LOGGER.error("无法加载这个PythonCraft包：" + packagePath, e);
-                continue;
+                throw new RuntimeException(
+                    "无法加载来自\"" + path + "\"的PythonCraft包。", e
+                );
             }
 
-            LOGGER.info(String.format(
-                "成功加载这个PythonCraft包：%s（%s）",
-                pkg.getMetaData().getPackageIdentifier(),
-                pkg.getMetaData().getPackageFriendlyName()
-            ));
+            futures.add(initPackage(pkg));
+            LOADED_MOD_PACKAGES.add(pkg);
         }
+
+        int i = 0;
+        for (Future<?> future : futures) {
+            Package pkg = LOADED_MOD_PACKAGES.get(i++);
+
+            try {
+                future.get(60, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(
+                    "PythonCraft包加载器遭到了外部的中断。", e
+                );
+            } catch (ExecutionException e) {
+                throw new RuntimeException(
+                    "包" + pkg.getFullName() + "无法被初始化，它的入口模块抛出了如下异常：", e
+                );
+            } catch (TimeoutException e) {
+                throw new RuntimeException(
+                    "包" + pkg.getFullName() + "无法被初始化，它的入口模块阻塞了超过60s。", e
+                );
+            }
+        }
+    }
+
+    private static FutureTask<?> initPackage(Package pkg) {
+        Path path = pkg.getMetaData().getEntrypointFilePath();
+
+        return PYTHON_THREAD_POOL.submit(
+            p -> p.execfile(path),
+            new PackagedProvider(
+                path, pkg.getMetaData().getClassProviderPaths()
+            )
+        );
     }
 
     @Override
@@ -145,8 +180,9 @@ public class PythonCraft implements ModInitializer {
 
         try {
             loadPackages();
-        } catch (IOException e) {
-            LOGGER.error("无法加载PythonCraft包。", e);
+        } catch (Exception e) {
+            LOGGER.error("包加载错误！", e);
+            throw new RuntimeException(e);
         }
     }
 }

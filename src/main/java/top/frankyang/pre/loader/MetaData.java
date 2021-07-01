@@ -3,6 +3,7 @@ package top.frankyang.pre.loader;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MetaData {
@@ -19,13 +20,17 @@ public class MetaData {
     public MetaData(MetaDataWrapper wrapper, Path packageRoot) {
         this.packageRoot = packageRoot;
 
-        entrypointFilePath = packageRoot.resolve(wrapper.getEntrypointFilePath());
-        packageIdentifier = wrapper.getPackageIdentifier();
+        entrypointFilePath = packageRoot.resolve(
+            Objects.requireNonNull(wrapper.getEntrypointFilePath(), "元数据中缺少模组入口（entrypointFilePath）。")
+        );
+        packageIdentifier =
+            Objects.requireNonNull(wrapper.getPackageIdentifier(), "元数据中缺少模组标识符（packageIdentifier）。");
         String friendlyName = wrapper.getPackageFriendlyName();
         packageFriendlyName = friendlyName != null ? friendlyName : "<N/A>";
         String description = wrapper.getPackageDescription();
         packageDescription = description != null ? description : "<N/A>";
-        packageThumbnailPath = packageRoot.resolve(wrapper.getPackageThumbnailPath());
+        String thumbnailPath = wrapper.getPackageThumbnailPath();
+        packageThumbnailPath = thumbnailPath != null ? packageRoot.resolve(wrapper.getPackageThumbnailPath()) : null;
         assetProviderPaths = Arrays.stream(wrapper.getAssetProviderPaths())
             .map(packageRoot::resolve)
             .collect(Collectors.toList());
@@ -52,6 +57,10 @@ public class MetaData {
 
     public Path getPackageThumbnailPath() {
         return packageThumbnailPath;
+    }
+
+    public boolean hasPackageThumbnail() {
+        return packageThumbnailPath != null;
     }
 
     public List<Path> getAssetProviderPaths() {

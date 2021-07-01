@@ -3,23 +3,25 @@ package top.frankyang.pre.util;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.util.List;
 
 public final class ClassLoaders {
     private ClassLoaders() {
     }
 
-    public static URLClassLoader get(String... URLs) {
-        URL[] jarURLs = (URL[]) Arrays.stream(URLs)
-            .map(s -> {
-                try {
-                    return new URL(s);
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .toArray();
+    public static URLClassLoader get(List<Path> paths) {
+        URL[] URLs = new URL[paths.size()];
 
-        return new URLClassLoader(jarURLs, Thread.currentThread().getContextClassLoader());
+        int i = 0;
+        for (Path path : paths) {
+            try {
+                URLs[i++] = path.toUri().toURL();
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("不能将路径转化为URL：" + path, e);
+            }
+        }
+
+        return new URLClassLoader(URLs, Thread.currentThread().getContextClassLoader());
     }
 }

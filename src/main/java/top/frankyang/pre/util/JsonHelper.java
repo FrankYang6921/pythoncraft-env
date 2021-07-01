@@ -17,12 +17,8 @@ public final class JsonHelper {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static <T> T deserialize(File file, Class<T> clazz) {
-        try {
-            return deserialize(Files.toString(file, StandardCharsets.UTF_8), clazz);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static <T> T deserialize(File file, Class<T> clazz) throws IOException {
+        return deserialize(Files.toString(file, StandardCharsets.UTF_8), clazz);
     }
 
     public static String serialize(Object object) {
@@ -30,11 +26,7 @@ public final class JsonHelper {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static void serialize(Object object, File file) {
-        try {
-            Files.write(serialize(object), file, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static void serialize(Object object, File file) throws IOException {
+        Files.write(serialize(object), file, StandardCharsets.UTF_8);
     }
 }

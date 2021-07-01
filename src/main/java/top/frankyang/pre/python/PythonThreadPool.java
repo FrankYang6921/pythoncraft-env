@@ -1,8 +1,6 @@
 package top.frankyang.pre.python;
 
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class PythonThreadPool {
@@ -20,13 +18,13 @@ public class PythonThreadPool {
         );
     }
 
-    public void submit(Consumer<? super Python> task, PythonProvider factory) {
-        executor.submit(() -> {
+    public FutureTask<?> submit(Consumer<? super Python> task, PythonProvider factory) {
+        return (FutureTask<?>) executor.submit(() -> {
             try (Python p = factory.newPython()) {
                 task.accept(p);
-                factory.onSuccessful(p);
+                factory.whenResolved(p);
             } catch (Exception e) {
-                factory.onException(e);
+                factory.whenRejected(e);
             }
         });
     }
