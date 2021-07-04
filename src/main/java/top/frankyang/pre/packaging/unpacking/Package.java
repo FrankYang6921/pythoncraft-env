@@ -1,6 +1,7 @@
-package top.frankyang.pre.loader;
+package top.frankyang.pre.packaging.unpacking;
 
 import com.google.gson.JsonParseException;
+import top.frankyang.pre.packaging.exceptions.PackageMetaDataException;
 import top.frankyang.pre.util.JsonHelper;
 
 import java.io.IOException;
@@ -18,15 +19,15 @@ public class Package {
                 packageRoot.resolve("meta.json").toFile(), MetaDataWrapper.class
             );
         } catch (IOException e) {
-            throw new RuntimeException("无法找到meta.json，不是有效的PythonCraft包。", e);
+            throw new PackageMetaDataException("无法找到meta.json，不是有效的PythonCraft包。", e);
         } catch (JsonParseException e) {
-            throw new RuntimeException("无法解析meta.json，不是有效的PythonCraft包。", e);
+            throw new PackageMetaDataException("无法解析meta.json，不是有效的PythonCraft包。", e);
         }
 
         try {
             metaData = new MetaData(wrapper, packageRoot);
         } catch (NullPointerException e) {
-            throw new RuntimeException("不完整的meta.json，不是有效的PythonCraft包。", e);
+            throw new PackageMetaDataException("不完整的meta.json，不是有效的PythonCraft包。", e);
         }
     }
 
@@ -41,8 +42,8 @@ public class Package {
     public String getFullName() {
         return String.format(
             "%s[%s]",
-            metaData.getPackageFriendlyName(),
-            metaData.getPackageIdentifier()
+            metaData.getFriendlyName(),
+            metaData.getIdentifier()
         );
     }
 

@@ -1,4 +1,4 @@
-package top.frankyang.pre.python;
+package top.frankyang.pre.python.internal;
 
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;

@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "top.frankyang.pre.PythonCraft"
+      "top.frankyang.pre.ModEntrance"
     ]
   },
   "mixins": [

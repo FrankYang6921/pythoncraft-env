@@ -1,11 +1,11 @@
-package top.frankyang.pre.interact;
+package top.frankyang.pre.python.providers;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import top.frankyang.pre.python.IndividualPythonImpl;
-import top.frankyang.pre.python.Python;
-import top.frankyang.pre.python.PythonProvider;
+import top.frankyang.pre.python.internal.IndividualPythonImpl;
+import top.frankyang.pre.python.internal.Python;
+import top.frankyang.pre.python.internal.PythonProvider;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

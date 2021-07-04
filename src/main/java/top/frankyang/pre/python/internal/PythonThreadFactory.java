@@ -1,4 +1,4 @@
-package top.frankyang.pre.python;
+package top.frankyang.pre.python.internal;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

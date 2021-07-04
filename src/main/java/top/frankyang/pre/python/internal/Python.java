@@ -1,6 +1,7 @@
-package top.frankyang.pre.python;
+package top.frankyang.pre.python.internal;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
@@ -17,4 +18,6 @@ public interface Python extends AutoCloseable, Closeable {
     void setOut(Writer outStream);
 
     void setErr(Writer outStream);
+
+    void close();  // IOException not allowed
 }
