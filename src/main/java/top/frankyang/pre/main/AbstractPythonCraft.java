@@ -7,14 +7,12 @@ import net.minecraft.text.LiteralText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.frankyang.pre.misc.Version;
-import top.frankyang.pre.packaging.unpacking.Package;
-import top.frankyang.pre.packaging.unpacking.PackageHandler;
-import top.frankyang.pre.packaging.unpacking.PackageLoader;
+import top.frankyang.pre.loader.loader.Package;
+import top.frankyang.pre.loader.loader.PackageHandler;
+import top.frankyang.pre.loader.loader.PackageLoader;
 import top.frankyang.pre.python.internal.PythonThreadPool;
 import top.frankyang.pre.python.providers.StandaloneProvider;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +27,7 @@ import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-abstract class BasePythonCraft implements PackageHandler {
+abstract class AbstractPythonCraft implements PackageHandler {
     // The default and main apache logger of PythonCraft.
     protected static final Logger logger = LogManager.getLogger(PythonCraft.class);
     // The environment root (.minecraft) of PythonCraft.
@@ -41,14 +39,11 @@ abstract class BasePythonCraft implements PackageHandler {
     protected final PythonThreadPool pythonThreadPool = new PythonThreadPool(
         0, 2147483647, 60, TimeUnit.SECONDS
     );
-    // The *ONLY* package loader of PythonCraft. Will be created in the abstract method `loadPackages()`.
-    protected final PackageLoader loader;
     // Whether command blocks are allowed to run PythonCraft scripts or not. Settable by commands.
     private boolean commandBlocks = true;
 
-    protected BasePythonCraft() {
+    protected AbstractPythonCraft() {
         registerCommands();
-        loader = loadPackages();
     }
 
     public static Logger getLogger() {
@@ -62,12 +57,6 @@ abstract class BasePythonCraft implements PackageHandler {
     public static Version getVersion() {
         return version;
     }
-
-    public List<Package> getPackages() {
-        return loader.getPackages();
-    }
-
-    protected abstract PackageLoader loadPackages();
 
     private void registerCommands() {
         CommandRegistrationCallback.EVENT.register(this::registerCommands);

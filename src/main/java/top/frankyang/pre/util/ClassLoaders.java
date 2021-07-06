@@ -1,16 +1,23 @@
 package top.frankyang.pre.util;
 
+import top.frankyang.pre.ModEntrance;
+import top.frankyang.pre.main.PythonCraft;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.List;
 
+import static top.frankyang.pre.ModEntrance.*;
+
 public final class ClassLoaders {
     private ClassLoaders() {
     }
 
-    public static URLClassLoader get(List<Path> paths) {
+    public static URL[] pathsToURLs(List<Path> paths) {
         URL[] URLs = new URL[paths.size()];
 
         int i = 0;
@@ -18,10 +25,60 @@ public final class ClassLoaders {
             try {
                 URLs[i++] = path.toUri().toURL();
             } catch (MalformedURLException e) {
-                throw new RuntimeException("不能将路径转化为URL：" + path, e);
+                throw new RuntimeException("Invalid path to cast to URL: " + path, e);
             }
         }
 
-        return new URLClassLoader(URLs, Thread.currentThread().getContextClassLoader());
+        return URLs;
+    }
+
+    public static void injectToKnot(URLClassLoader classLoader, URL[] classURLs) {
+        try {
+            Object knotLoader = ClassLoaders.class.getClassLoader();
+
+            PythonCraft.getLogger().info(
+                "Injecting to the target: `{}`.", knotLoader
+            );
+
+            Class<?> clazz;
+            Field field;
+            Method method;
+            Object object;
+
+            // Replaces fabric's `originalLoader` with customized class loader.
+            clazz = knotLoader.getClass();
+            field = clazz.getDeclaredField("originalLoader");
+            field.setAccessible(true);
+            field.set(knotLoader, classLoader);
+
+            // Acquires fabric's `urlLoader` in order to add extra URLs to it.
+            field = clazz.getDeclaredField("urlLoader");
+            field.setAccessible(true);
+            object = field.get(knotLoader);
+
+            // Gets `urlLoader`'s `addURL` method in order to add the extra URLs.
+            clazz = object.getClass();
+            method = clazz.getMethod("addURL", URL.class);
+            method.setAccessible(true);
+
+            // Add the extra URLs!
+            if (classURLs.length == 0) {
+                PythonCraft.getLogger().warn(
+                    "No user URL class path registered. No need for injection."
+                );
+            }
+            for (URL classPath : classURLs) {
+                method.invoke(object, classPath);
+                PythonCraft.getLogger().info(
+                    "Injected a user URL class path: {}.", classPath
+                );
+            }
+
+            PythonCraft.getLogger().info(
+                "Replaced original loader: `{}`.", classLoader
+            );
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -41,13 +41,17 @@ public class StandaloneProvider implements PythonProvider {
     @Override
     public void whenResolved(Python python) {
         sendBufferToFeedback();
-        context.getSource().sendFeedback(new LiteralText("运行了PythonCraft脚本，并且没有捕获到任何异常。"), true);
+        context.getSource().sendFeedback(new LiteralText(
+            "A PythonCraft script is executed and no catchable exceptions are caught."
+        ), true);
     }
 
     @Override
     public void whenRejected(Exception e) {
         sendBufferToFeedback();
-        context.getSource().sendFeedback(new LiteralText("运行了PythonCraft脚本，但是捕获到了如下异常。"), true);
+        context.getSource().sendFeedback(new LiteralText(
+            "A PythonCraft script is executed but the following exceptions are caught."
+        ), true);
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
         context.getSource().sendFeedback(new LiteralText(writer.toString()), true);

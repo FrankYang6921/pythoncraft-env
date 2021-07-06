@@ -1,8 +1,6 @@
-package top.frankyang.pre.packaging.unpacking;
+package top.frankyang.pre.loader.loader;
 
 import com.google.gson.annotations.SerializedName;
-
-import java.util.Arrays;
 
 public class MetaDataWrapper {
     @SerializedName(value = "entrypointPath", alternate = {"entryPnt"})
@@ -23,10 +21,10 @@ public class MetaDataWrapper {
     private final String fabricVersion;
     @SerializedName(value = "loaderVersion", alternate = {"loaderVer"})
     private final String loaderVersion;
-    @SerializedName(value = "assetProviders", alternate = {"assets"})
-    private final String[] assetProviders;
-    @SerializedName(value = "classProviders", alternate = {"classes"})
-    private final String[] classProviders;
+    @SerializedName(value = "classPaths", alternate = {"classes"})
+    private final String[] classPaths;
+    @SerializedName(value = "assetPaths", alternate = {"assets"})
+    private final String[] assetPaths;
 
     private MetaDataWrapper(String entrypointPath,
                             String identifier,
@@ -38,7 +36,8 @@ public class MetaDataWrapper {
                             String fabricVersion,
                             String loaderVersion,
                             String[] assetProviders,
-                            String[] classProviders) {
+                            String[] classPaths,
+                            String[] assetPaths) {
         this.entrypointPath = entrypointPath;
         this.identifier = identifier;
         this.friendlyName = friendlyName;
@@ -48,8 +47,8 @@ public class MetaDataWrapper {
         this.gameVersion = gameVersion;
         this.fabricVersion = fabricVersion;
         this.loaderVersion = loaderVersion;
-        this.assetProviders = assetProviders;
-        this.classProviders = classProviders;
+        this.classPaths = classPaths;
+        this.assetPaths = assetPaths;
     }
 
 
@@ -89,28 +88,11 @@ public class MetaDataWrapper {
         return loaderVersion;
     }
 
-    public String[] getAssetProviders() {
-        return assetProviders;
+    public String[] getClassPaths() {
+        return classPaths;
     }
 
-    public String[] getClassProviders() {
-        return classProviders;
-    }
-
-    @Override
-    public String toString() {
-        return "MetaDataWrapper{" +
-            "entrypointPath='" + entrypointPath + '\'' +
-            ", identifier='" + identifier + '\'' +
-            ", friendlyName='" + friendlyName + '\'' +
-            ", description='" + description + '\'' +
-            ", thumbnailPath='" + thumbnailPath + '\'' +
-            ", packageVersion='" + packageVersion + '\'' +
-            ", gameVersion='" + gameVersion + '\'' +
-            ", fabricVersion='" + fabricVersion + '\'' +
-            ", loaderVersion='" + loaderVersion + '\'' +
-            ", assetProviders=" + Arrays.toString(assetProviders) +
-            ", classProviders=" + Arrays.toString(classProviders) +
-            '}';
+    public String[] getAssetPaths() {
+        return assetPaths;
     }
 }

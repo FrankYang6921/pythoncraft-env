@@ -1,9 +1,10 @@
-package top.frankyang.pre.packaging.unpacking;
+package top.frankyang.pre.loader.loader;
 
 import top.frankyang.pre.misc.Version;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,14 +19,10 @@ public class MetaData {
     private final Version gameVersion;
     private final Version fabricVersion;
     private final Version loaderVersion;
-    private final List<Path> assetProviders;
-    private final List<Path> classProviders;
-
-    private final Path packageRoot;
+    private final List<Path> classPaths;
+    private final List<Path> assetPaths;
 
     public MetaData(MetaDataWrapper wrapper, Path packageRoot) {
-        this.packageRoot = packageRoot;
-
         entrypointPath = packageRoot.resolve(
             Objects.requireNonNull(wrapper.getEntrypointPath(), "元数据中缺少模组入口（entrypointFilePath）。")
         );
@@ -55,13 +52,19 @@ public class MetaData {
         version = wrapper.getLoaderVersion();
         loaderVersion = version != null ? new Version(version) : Version.ANY;
 
-        assetProviders = Arrays.stream(wrapper.getAssetProviders())
-            .map(packageRoot::resolve)
-            .collect(Collectors.toList());
+        if (wrapper.getClassPaths() != null)
+            classPaths = Arrays.stream(wrapper.getClassPaths())
+                .map(packageRoot::resolve)
+                .collect(Collectors.toList());
+        else
+            classPaths = Collections.emptyList();
 
-        classProviders = Arrays.stream(wrapper.getClassProviders())
-            .map(packageRoot::resolve)
-            .collect(Collectors.toList());
+        if (wrapper.getAssetPaths() != null)
+            assetPaths = Arrays.stream(wrapper.getAssetPaths())
+                .map(packageRoot::resolve)
+                .collect(Collectors.toList());
+        else
+            assetPaths = Collections.emptyList();
     }
 
     public Path getEntrypointPath() {
@@ -104,29 +107,11 @@ public class MetaData {
         return loaderVersion;
     }
 
-    public List<Path> getAssetProviders() {
-        return assetProviders;
+    public List<Path> getClassPaths() {
+        return classPaths;
     }
 
-    public List<Path> getClassProviders() {
-        return classProviders;
-    }
-
-    @Override
-    public String toString() {
-        return "MetaData{" +
-            "entrypointPath=" + entrypointPath +
-            ", identifier='" + identifier + '\'' +
-            ", friendlyName='" + friendlyName + '\'' +
-            ", description='" + description + '\'' +
-            ", thumbnailPath=" + thumbnailPath +
-            ", packageVersion=" + packageVersion +
-            ", gameVersion=" + gameVersion +
-            ", fabricVersion=" + fabricVersion +
-            ", loaderVersion=" + loaderVersion +
-            ", assetProviders=" + assetProviders +
-            ", classProviders=" + classProviders +
-            ", packageRoot=" + packageRoot +
-            '}';
+    public List<Path> getAssetPaths() {
+        return assetPaths;
     }
 }

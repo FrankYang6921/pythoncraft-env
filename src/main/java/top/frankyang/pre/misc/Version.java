@@ -1,9 +1,10 @@
 package top.frankyang.pre.misc;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public final class Version extends Number implements Comparable<Version> {
-    public static final Version ANY = new Version("*.*s.*.*");
+    public static final Version ANY = new Version("*.*.*.*");
     private final long a, b, c, d;
 
     public Version(String versionString) {

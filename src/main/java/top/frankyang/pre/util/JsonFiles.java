@@ -6,10 +6,10 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public final class JsonHelper {
+public final class JsonFiles {
     private static final Gson gson = new Gson();  // Manages a simple Gson object.
 
-    private JsonHelper() {
+    private JsonFiles() {
     }
 
     public static <T> T deserialize(String json, Class<T> clazz) {

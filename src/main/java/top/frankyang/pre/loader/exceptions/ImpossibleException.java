@@ -1,4 +1,4 @@
-package top.frankyang.pre.packaging.exceptions;
+package top.frankyang.pre.loader.exceptions;
 
 public class ImpossibleException extends RuntimeException {
     public ImpossibleException() {

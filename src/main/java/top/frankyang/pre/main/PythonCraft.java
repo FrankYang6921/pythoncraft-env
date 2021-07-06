@@ -1,23 +1,33 @@
 package top.frankyang.pre.main;
 
-import top.frankyang.pre.packaging.exceptions.ImpossibleException;
-import top.frankyang.pre.packaging.exceptions.PackageInitializationException;
-import top.frankyang.pre.packaging.exceptions.PackageConstructionException;
-import top.frankyang.pre.packaging.exceptions.PermissionDeniedException;
-import top.frankyang.pre.packaging.unpacking.PackageLoaderImpl;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import top.frankyang.pre.loader.PackageManager;
+import top.frankyang.pre.loader.loader.Package;
+import top.frankyang.pre.loader.loader.PackageLoaderImpl;
 import top.frankyang.pre.python.providers.PackagedProvider;
-import top.frankyang.pre.packaging.unpacking.Package;
-import top.frankyang.pre.packaging.unpacking.PackageLoader;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Future;
 
-public class PythonCraft extends BasePythonCraft {
+public class PythonCraft extends AbstractPythonCraft {
+    public static final Block EXAMPLE_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
+    private final PackageManager pkgMgr;
+
     private PythonCraft() {
         super();
+        pkgMgr = new PackageManager(new PackageLoaderImpl(Paths.get(envRoot, "scripts"), this));
+        pkgMgr.construct();
+
+        Registry.register(Registry.BLOCK, new Identifier("pre", "example_block"), EXAMPLE_BLOCK);
+        Registry.register(Registry.ITEM, new Identifier("pre", "example_block"), new BlockItem(EXAMPLE_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -25,39 +35,8 @@ public class PythonCraft extends BasePythonCraft {
         return PythonCraftSingleton.INSTANCE;
     }
 
-    @Override
-    protected PackageLoader loadPackages() {  // TODO Reload without the malformed package instead of crash.
-        try {
-            Files.createDirectories(Paths.get(envRoot, "scripts"));
-        } catch (IOException e) {
-            throw new PermissionDeniedException(
-                "在创建.minecraft/scripts/时拒绝访问。", e
-            );
-        }
-
-        PackageLoader loader = new PackageLoaderImpl(
-            Paths.get(envRoot, "scripts"), this
-        );
-        try {
-            loader.loadAll();
-        } catch (PackageConstructionException e) {
-            logger.error("上游加载器在加载包时出现了异常。", e);
-            throw e;
-        } catch (PackageInitializationException e) {
-            logger.error("上游加载器在初始化包时出现了异常。", e);
-            throw e;
-        } catch (PermissionDeniedException e) {
-            logger.error("上游加载器在访问文件时拒绝访问。", e);
-            throw e;
-        } catch (ImpossibleException e) {
-            logger.error("上游加载器遇到了不可能发生的异常。这通常是由于一个模组或特定版本的JRE与PythonCraft冲突了。", e);
-            throw e;
-        } catch (Throwable throwable) {
-            logger.fatal("出现了预料之外的异常，这通常不可能发生。", throwable);
-            throw throwable;
-        }
-
-        return loader;
+    public PackageManager getPackageManager() {
+        return pkgMgr;
     }
 
     @Override
@@ -67,7 +46,8 @@ public class PythonCraft extends BasePythonCraft {
         return pythonThreadPool.submit(
             p -> p.execfile(path),
             new PackagedProvider(
-                path, pkg.getMetaData().getClassProviders()
+                path.getParent().toString(),
+                pkgMgr.getUserClassLoader()
             )
         );
     }

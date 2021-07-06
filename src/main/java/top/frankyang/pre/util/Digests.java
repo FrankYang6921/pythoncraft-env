@@ -1,6 +1,6 @@
 package top.frankyang.pre.util;
 
-import top.frankyang.pre.packaging.exceptions.ImpossibleException;
+import top.frankyang.pre.loader.exceptions.ImpossibleException;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

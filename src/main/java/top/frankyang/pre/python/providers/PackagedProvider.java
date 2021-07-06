@@ -12,9 +12,9 @@ public class PackagedProvider implements PythonProvider {
     private final String path;
     private final ClassLoader loader;
 
-    public PackagedProvider(Path path, List<Path> classes) {
-        this.path = path.getParent().toString();
-        loader = ClassLoaders.get(classes);
+    public PackagedProvider(String path, ClassLoader loader) {
+        this.path = path;
+        this.loader = loader;
     }
 
     @Override

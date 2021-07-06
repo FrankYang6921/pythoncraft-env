@@ -1,38 +1,44 @@
-package top.frankyang.pre.packaging.unpacking;
+package top.frankyang.pre.loader.loader;
 
 import com.google.gson.JsonParseException;
-import top.frankyang.pre.packaging.exceptions.PackageMetaDataException;
-import top.frankyang.pre.util.JsonHelper;
+import top.frankyang.pre.loader.exceptions.PkgMetaException;
+import top.frankyang.pre.util.JsonFiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 public class Package {
     private final Path packageRoot;
+    private final Path packageSrc;
     private final MetaData metaData;
 
-    Package(Path packageRoot) {
+    Package(Path packageRoot, Path packageSrc) {
         this.packageRoot = packageRoot;
+        this.packageSrc = packageSrc;
         MetaDataWrapper wrapper;
         try {
-            wrapper = JsonHelper.deserialize(
+            wrapper = JsonFiles.deserialize(
                 packageRoot.resolve("meta.json").toFile(), MetaDataWrapper.class
             );
         } catch (IOException e) {
-            throw new PackageMetaDataException("无法找到meta.json，不是有效的PythonCraft包。", e);
+            throw new PkgMetaException("Cannot find meta.json, not a valid PythonCraft package.", e);
         } catch (JsonParseException e) {
-            throw new PackageMetaDataException("无法解析meta.json，不是有效的PythonCraft包。", e);
+            throw new PkgMetaException("Cannot parse meta.json, not a valid PythonCraft package.", e);
         }
 
         try {
             metaData = new MetaData(wrapper, packageRoot);
         } catch (NullPointerException e) {
-            throw new PackageMetaDataException("不完整的meta.json，不是有效的PythonCraft包。", e);
+            throw new PkgMetaException("Incomplete meta.json, not a valid PythonCraft package.", e);
         }
     }
 
     public Path getPackageRoot() {
         return packageRoot;
+    }
+
+    public Path getPackageSrc() {
+        return packageSrc;
     }
 
     public MetaData getMetaData() {
