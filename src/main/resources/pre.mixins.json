@@ -4,7 +4,9 @@
   "package": "top.frankyang.pre.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ResourcePackMixin"
+    "ClientBrandInjector",
+    "ResourcePackInjector",
+    "TitleScreenInjector"
   ],
   "injectors": {
     "defaultRequire": 1

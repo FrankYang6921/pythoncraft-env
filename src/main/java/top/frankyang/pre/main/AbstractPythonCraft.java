@@ -7,13 +7,10 @@ import net.minecraft.text.LiteralText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.frankyang.pre.misc.Version;
-import top.frankyang.pre.loader.loader.Package;
-import top.frankyang.pre.loader.loader.PackageHandler;
-import top.frankyang.pre.loader.loader.PackageLoader;
+import top.frankyang.pre.python.internal.PythonExecutor;
 import top.frankyang.pre.python.internal.PythonThreadPool;
 import top.frankyang.pre.python.providers.StandaloneProvider;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
@@ -27,15 +24,14 @@ import static com.mojang.brigadier.arguments.StringArgumentType.string;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-abstract class AbstractPythonCraft implements PackageHandler {
+abstract class AbstractPythonCraft {
     // The default and main apache logger of PythonCraft.
-    protected static final Logger logger = LogManager.getLogger(PythonCraft.class);
+    protected final Logger logger = LogManager.getLogger(PythonCraft.class);
     // The environment root (.minecraft) of PythonCraft.
-    protected static final String envRoot = System.getProperty("user.dir");
+    protected final String envRoot = System.getProperty("user.dir");
     // The version of PythonCraft loader .
-    protected static final Version version = new Version("0.0.1");
-
-    // The *ONLY* thread pool used to deploy Python in PythonCraft. Uses instance field to defer loading.
+    protected final Version version = new Version("0.0.1");
+    // The *ONLY* thread pool used to deploy Python in PythonCraft.
     protected final PythonThreadPool pythonThreadPool = new PythonThreadPool(
         0, 2147483647, 60, TimeUnit.SECONDS
     );
@@ -46,16 +42,20 @@ abstract class AbstractPythonCraft implements PackageHandler {
         registerCommands();
     }
 
-    public static Logger getLogger() {
+    public Logger getLogger() {
         return logger;
     }
 
-    public static String getEnvRoot() {
+    public String getEnvRoot() {
         return envRoot;
     }
 
-    public static Version getVersion() {
+    public Version getVersion() {
         return version;
+    }
+
+    public PythonExecutor getPythonExecutor() {
+        return pythonThreadPool;
     }
 
     private void registerCommands() {

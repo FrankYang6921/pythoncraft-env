@@ -36,7 +36,7 @@ public final class ClassLoaders {
         try {
             Object knotLoader = ClassLoaders.class.getClassLoader();
 
-            PythonCraft.getLogger().info(
+            PythonCraft.getInstance().getLogger().info(
                 "Injecting to the target: `{}`.", knotLoader
             );
 
@@ -63,18 +63,18 @@ public final class ClassLoaders {
 
             // Add the extra URLs!
             if (classURLs.length == 0) {
-                PythonCraft.getLogger().warn(
+                PythonCraft.getInstance().getLogger().warn(
                     "No user URL class path registered. No need for injection."
                 );
             }
             for (URL classPath : classURLs) {
                 method.invoke(object, classPath);
-                PythonCraft.getLogger().info(
+                PythonCraft.getInstance().getLogger().info(
                     "Injected a user URL class path: {}.", classPath
                 );
             }
 
-            PythonCraft.getLogger().info(
+            PythonCraft.getInstance().getLogger().info(
                 "Replaced original loader: `{}`.", classLoader
             );
         } catch (ReflectiveOperationException e) {

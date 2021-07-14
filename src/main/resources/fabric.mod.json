@@ -14,7 +14,7 @@
   },
 
   "license": "GPLv3",
-  "icon": "assets/pre/icon.png",
+  "icon": "/assets/pre/icon_white.png",
 
   "environment": "*",
   "entrypoints": {
