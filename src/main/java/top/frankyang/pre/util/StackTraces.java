@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 public final class StackTraces {
     private StackTraces() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     public static String translate(String stackTrace) {
@@ -51,6 +52,7 @@ public final class StackTraces {
             "Traceback (most recent call last):", "\n\n[Python异常栈（通常是最后调用的）]"
         );
         stackTrace = stackTrace.replace("\t", "  ");
+        stackTrace = stackTrace.replace("\r", "");
         return stackTrace;
     }
 }

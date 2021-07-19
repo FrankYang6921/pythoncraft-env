@@ -1,6 +1,5 @@
 package top.frankyang.pre.util;
 
-import top.frankyang.pre.ModEntrance;
 import top.frankyang.pre.main.PythonCraft;
 
 import java.lang.reflect.Field;
@@ -11,10 +10,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.List;
 
-import static top.frankyang.pre.ModEntrance.*;
-
 public final class ClassLoaders {
     private ClassLoaders() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     public static URL[] pathsToURLs(List<Path> paths) {
@@ -34,7 +32,7 @@ public final class ClassLoaders {
 
     public static void injectToKnot(URLClassLoader classLoader, URL[] classURLs) {
         try {
-            Object knotLoader = ClassLoaders.class.getClassLoader();
+            ClassLoader knotLoader = ClassLoaders.class.getClassLoader();
 
             PythonCraft.getInstance().getLogger().info(
                 "Injecting to the target: `{}`.", knotLoader

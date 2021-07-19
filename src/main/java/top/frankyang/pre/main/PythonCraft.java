@@ -1,13 +1,6 @@
 package top.frankyang.pre.main;
 
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.Material;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import top.frankyang.pre.api.Minecraft;
 import top.frankyang.pre.gui.PackageExceptionFrame;
 import top.frankyang.pre.loader.PackageManager;
 import top.frankyang.pre.loader.core.Pack;
@@ -15,12 +8,10 @@ import top.frankyang.pre.loader.core.PackageLoader;
 
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class PythonCraft extends AbstractPythonCraft {
-    public static final Block EXAMPLE_BLOCK = new Block(FabricBlockSettings.of(Material.METAL).strength(4.0f));
-    private PackageManager pkgMgr;
+    private PackageManager packageManager;
 
     private PythonCraft() {
         super();
@@ -32,29 +23,26 @@ public class PythonCraft extends AbstractPythonCraft {
     }
 
     private void initialize() {
-        pkgMgr = new PackageManager(() ->
-            new PackageLoader(Paths.get(envRoot, "scripts"))
+        packageManager = new PackageManager(() ->
+            new PackageLoader(Minecraft.getPackagesPath())
         );
-        pkgMgr.tryToConstruct(PackageExceptionFrame::open);
-
-        Registry.register(Registry.BLOCK, new Identifier("pre", "example_block"), EXAMPLE_BLOCK);
-        Registry.register(Registry.ITEM, new Identifier("pre", "example_block"), new BlockItem(EXAMPLE_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
-    }
-
-    public PackageManager getPackageManager() {
-        return pkgMgr;
+        packageManager.tryToConstruct(PackageExceptionFrame::open);
     }
 
     public URLClassLoader getUserClassLoader() {
-        return pkgMgr.getUserClassLoader();
+        return packageManager.getUserClassLoader();
     }
 
     public List<Path> getUserClassPaths() {
-        return pkgMgr.getUserClassPaths();
+        return packageManager.getUserClassPaths();
     }
 
     public List<Pack> getUserResourcePacks() {
-        return pkgMgr.getUserResourcePacks();
+        return packageManager.getUserResourcePacks();
+    }
+
+    public PackageManager getPackageManager() {
+        return this.packageManager;
     }
 
     private static class PythonCraftSingleton {

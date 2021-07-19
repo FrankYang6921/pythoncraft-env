@@ -18,11 +18,15 @@ public final class Constants {
     private static ImageIcon btnEnabled;
     private static ImageIcon background;
 
+    private Constants() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
     public static Font getFont() {
         if (font == null) {
             InputStream stream = Constants.class.getResourceAsStream("/assets/pre/default_font.ttf");
             try {
-                return font = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(16f);
+                return font = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(stream)).deriveFont(16f);
             } catch (FontFormatException | IOException e) {
                 throw new RuntimeIOException(e);
             }
@@ -31,19 +35,19 @@ public final class Constants {
     }
 
     public static ImageIcon getIcon() {
-        return icon = requireNonNullElseGet(icon, () -> new ImageIcon(Constants.class.getResource("/assets/pre/icon_trans.png")));
+        return icon = requireNonNullElseGet(icon, () -> new ImageIcon(Objects.requireNonNull(Constants.class.getResource("/assets/pre/icon_trans.png"))));
     }
 
     public static ImageIcon getBtnDisabled() {
-        return btnDisabled = requireNonNullElseGet(btnDisabled, () -> new ImageIcon(Constants.class.getResource("/assets/pre/btn_disabled.png")));
+        return btnDisabled = requireNonNullElseGet(btnDisabled, () -> new ImageIcon(Objects.requireNonNull(Constants.class.getResource("/assets/pre/btn_disabled.png"))));
     }
 
     public static ImageIcon getBtnEnabled() {
-        return btnEnabled = requireNonNullElseGet(btnEnabled, () -> new ImageIcon(Constants.class.getResource("/assets/pre/btn_enabled.png")));
+        return btnEnabled = requireNonNullElseGet(btnEnabled, () -> new ImageIcon(Objects.requireNonNull(Constants.class.getResource("/assets/pre/btn_enabled.png"))));
     }
 
     public static ImageIcon getBackground() {
-        return background = requireNonNullElseGet(background, () -> new ImageIcon(Constants.class.getResource("/assets/pre/background.png")));
+        return background = requireNonNullElseGet(background, () -> new ImageIcon(Objects.requireNonNull(Constants.class.getResource("/assets/pre/background.png"))));
     }
 
     private static <T> T requireNonNullElseGet(T obj, Supplier<? extends T> supplier) {

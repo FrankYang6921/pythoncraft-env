@@ -3,8 +3,8 @@ package top.frankyang.pre.loader.core;
 import com.google.gson.annotations.SerializedName;
 
 public class MetaDataWrapper {
-    @SerializedName(value = "entrypointPath", alternate = {"entryPnt"})
-    private final String entrypointPath;
+    @SerializedName(value = "entrypoint", alternate = {"main"})
+    private final String entrypoint;
     @SerializedName(value = "identifier", alternate = {"id"})
     private final String identifier;
     @SerializedName(value = "friendlyName", alternate = {"name"})
@@ -26,19 +26,18 @@ public class MetaDataWrapper {
     @SerializedName(value = "assetPaths", alternate = {"assets"})
     private final String[] assetPaths;
 
-    private MetaDataWrapper(String entrypointPath,
-                            String identifier,
-                            String friendlyName,
-                            String description,
-                            String thumbnailPath,
-                            String packageVersion,
-                            String gameVersion,
-                            String fabricVersion,
-                            String loaderVersion,
-                            String[] assetProviders,
-                            String[] classPaths,
-                            String[] assetPaths) {
-        this.entrypointPath = entrypointPath;
+    public MetaDataWrapper(String entrypoint,
+                           String identifier,
+                           String friendlyName,
+                           String description,
+                           String thumbnailPath,
+                           String packageVersion,
+                           String gameVersion,
+                           String fabricVersion,
+                           String loaderVersion,
+                           String[] classPaths,
+                           String[] assetPaths) {
+        this.entrypoint = entrypoint;
         this.identifier = identifier;
         this.friendlyName = friendlyName;
         this.description = description;
@@ -51,48 +50,47 @@ public class MetaDataWrapper {
         this.assetPaths = assetPaths;
     }
 
-
-    public String getEntrypointPath() {
-        return entrypointPath;
+    public String getEntrypoint() {
+        return this.entrypoint;
     }
 
     public String getIdentifier() {
-        return identifier;
+        return this.identifier;
     }
 
     public String getFriendlyName() {
-        return friendlyName;
+        return this.friendlyName;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public String getThumbnailPath() {
-        return thumbnailPath;
+        return this.thumbnailPath;
     }
 
     public String getPackageVersion() {
-        return packageVersion;
+        return this.packageVersion;
     }
 
     public String getGameVersion() {
-        return gameVersion;
+        return this.gameVersion;
     }
 
     public String getFabricVersion() {
-        return fabricVersion;
+        return this.fabricVersion;
     }
 
     public String getLoaderVersion() {
-        return loaderVersion;
+        return this.loaderVersion;
     }
 
     public String[] getClassPaths() {
-        return classPaths;
+        return this.classPaths;
     }
 
     public String[] getAssetPaths() {
-        return assetPaths;
+        return this.assetPaths;
     }
 }

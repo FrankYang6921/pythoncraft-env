@@ -14,6 +14,7 @@ import java.util.zip.ZipException;
 
 public final class PackageFactory {
     private PackageFactory() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     public static Package get(String filename) {

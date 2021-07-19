@@ -14,7 +14,7 @@ public class DummyPackage implements Package {
     public DummyPackage(Path src) {
         packageSrc = src;
         packageRoot = src.getParent();
-        metaData = MetaData.dummy(src);
+        metaData = new MetaData(src);
     }
 
     @Override

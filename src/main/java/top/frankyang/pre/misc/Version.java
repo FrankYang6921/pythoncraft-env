@@ -1,6 +1,7 @@
 package top.frankyang.pre.misc;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 public final class Version extends Number implements Comparable<Version> {
@@ -10,20 +11,30 @@ public final class Version extends Number implements Comparable<Version> {
     public Version(String versionString) {
         String[] strings = versionString.split("\\.");
         a = strings[0].equals("*") ? -1 : Short.parseShort(strings[0]);
-        b = strings[1].equals("*") ? -1 : Short.parseShort(strings[1]);
+        if (strings.length > 1)
+            b = strings[1].equals("*") ? -1 : Short.parseShort(strings[1]);
+        else
+            b = 0;
         if (strings.length > 2)
             c = strings[2].equals("*") ? -1 : Short.parseShort(strings[2]);
         else
-            c = -1;
+            c = 0;
         if (strings.length > 3)
             d = strings[3].equals("*") ? -1 : Short.parseShort(strings[3]);
         else
-            d = -1;
+            d = 0;
     }
 
     @Override
     public String toString() {
-        return "v" + (a < 0 ? "*" : a) +  '.' + (b < 0 ? "*" : b) + '.' + (c < 0 ? "*" : c)+ '.' + (d < 0 ? "*" : d);
+        if (b == 0 && c == 0 && d == 0)
+            return "v" + (a < 0 ? "*" : a);
+        else if (c == 0 && d == 0)
+            return "v" + (a < 0 ? "*" : a) + '.' + (b < 0 ? "*" : b);
+        else if (d == 0)
+            return "v" + (a < 0 ? "*" : a) + '.' + (b < 0 ? "*" : b) + '.' + (c < 0 ? "*" : c);
+        else
+            return "v" + (a < 0 ? "*" : a) + '.' + (b < 0 ? "*" : b) + '.' + (c < 0 ? "*" : c) + '.' + (d < 0 ? "*" : d);
     }
 
     @Override
@@ -40,7 +51,7 @@ public final class Version extends Number implements Comparable<Version> {
     }
 
     @Override
-    public int compareTo(Version o) {
+    public int compareTo(@NotNull Version o) {
         if (a >= 0 && o.a >= 0) {
             return Long.compare(a, o.a);
         }

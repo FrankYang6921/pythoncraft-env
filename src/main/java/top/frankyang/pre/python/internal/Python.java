@@ -1,7 +1,6 @@
 package top.frankyang.pre.python.internal;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;

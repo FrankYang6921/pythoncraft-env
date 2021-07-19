@@ -7,7 +7,7 @@ public interface PythonProvider {
     default void whenResolved(Python python) {  // Try
     }
 
-    default void whenRejected(Exception e){  // Catch
+    default void whenRejected(Exception e) {  // Catch
         throw new RuntimeException(e);
     }
 

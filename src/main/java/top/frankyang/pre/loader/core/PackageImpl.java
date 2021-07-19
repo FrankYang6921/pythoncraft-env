@@ -61,14 +61,14 @@ public class PackageImpl implements Package {
     @Override
     public Future<?> onConstruction(PythonExecutor executor) {
         Path path = getMetaData().getEntrypoint();
-
         return executor.submit(
             p -> p.execfile(path),
             new PackagedProvider(
                 path.getParent().toString(),
                 PythonCraft.getInstance()
                     .getPackageManager()
-                    .getUserClassLoader()
+                    .getUserClassLoader(),
+                this
             )
         );
     }

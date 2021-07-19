@@ -55,13 +55,10 @@ public class PackageManager {
         return Collections.unmodifiableList(userResourcePacks);
     }
 
-    public ManagerStatus getManagerStatus() {
-        return managerStatus;
-    }
-
-    public void openManagerWindow() {
+    public void openManagerFrame() {
         if (managerStatus == ManagerStatus.EMPTY || managerStatus == ManagerStatus.FAILED)
             throw new IllegalStateException("This manager is not loaded or failed.");
+
         if (managerFrameOpen) {
             PackageManagerFrame.raise();
             return;
@@ -184,5 +181,9 @@ public class PackageManager {
         userClassLoader = null;
         causeSource = causeSrc;
         managerStatus = ManagerStatus.FAILED;
+    }
+
+    public ManagerStatus getManagerStatus() {
+        return this.managerStatus;
     }
 }

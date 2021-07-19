@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class PackageInfo {
     private final String fullName;
@@ -30,10 +31,10 @@ public class PackageInfo {
             thumbnail = new ImageIcon(meta.getThumbnail().toString());
         } else if (disabled) {
             PythonCraft.getInstance().getLogger().warn("Package " + pkg + "(disabled) does not have a thumbnail.");
-            thumbnail = new ImageIcon(PackageInfo.class.getResource("/assets/pre/icon_false.png"));
+            thumbnail = new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_false.png")));
         } else {
             PythonCraft.getInstance().getLogger().warn("Package " + pkg + "(enabled) does not have a thumbnail.");
-            thumbnail = new ImageIcon(PackageInfo.class.getResource("/assets/pre/icon_white.png"));
+            thumbnail = new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_white.png")));
         }
     }
 
@@ -73,13 +74,13 @@ public class PackageInfo {
         if (disabled)
             throw new UnsupportedOperationException();
         Path src = Packages.disable(packageSrc);
-        return new PackageInfo(fullName, description, true, src, new ImageIcon(PackageInfo.class.getResource("/assets/pre/icon_false.png")));
+        return new PackageInfo(fullName, description, true, src, new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_false.png"))));
     }
 
     public PackageInfo enable() {
         if (!disabled)
             throw new UnsupportedOperationException();
         Path src = Packages.enable(packageSrc);
-        return new PackageInfo(fullName, description, false, src, new ImageIcon(PackageInfo.class.getResource("/assets/pre/icon_white.png")));
+        return new PackageInfo(fullName, description, false, src, new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_white.png"))));
     }
 }

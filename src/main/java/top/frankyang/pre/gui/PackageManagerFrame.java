@@ -14,7 +14,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-public class PackageManagerFrame extends CloseWaitingFrame {
+public final class PackageManagerFrame extends CloseWaitingFrame {
     private static PackageManagerFrame instance;
     private final MineButton enable;
     private final MineButton disable;
@@ -185,7 +185,7 @@ public class PackageManagerFrame extends CloseWaitingFrame {
                 fill = HORIZONTAL;
             }};
 
-            MineLabel label = new FillingLabel(info.getFullName());
+            FillingLabel label = new FillingLabel(info.getFullName());
             inner.add(label, constraints);
             constraints.gridy++;
 

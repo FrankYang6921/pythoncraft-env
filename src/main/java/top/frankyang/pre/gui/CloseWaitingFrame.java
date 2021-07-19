@@ -1,7 +1,6 @@
 package top.frankyang.pre.gui;
 
 import top.frankyang.pre.gui.controls.MineFrame;
-import top.frankyang.pre.loader.exceptions.ImpossibleException;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;

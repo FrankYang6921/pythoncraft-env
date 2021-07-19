@@ -2,7 +2,6 @@ package top.frankyang.pre.misc;
 
 import com.google.gson.JsonElement;
 import net.fabricmc.loader.api.Version;
-import net.fabricmc.loader.api.VersionParsingException;
 import net.fabricmc.loader.api.metadata.*;
 
 import java.util.Collection;
@@ -19,7 +18,7 @@ public class FakeMetadata implements ModMetadata {
 
     @Override
     public String getType() {
-        return "";
+        return "fabric";
     }
 
     @Override
@@ -28,12 +27,13 @@ public class FakeMetadata implements ModMetadata {
     }
 
     @Override
+    public Collection<String> getProvides() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public Version getVersion() {
-        try {
-            return Version.parse("1.0.0");
-        } catch (VersionParsingException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     @Override
@@ -68,12 +68,12 @@ public class FakeMetadata implements ModMetadata {
 
     @Override
     public String getName() {
-        return "";
+        return "<DUMMY>";
     }
 
     @Override
     public String getDescription() {
-        return "";
+        return "<DUMMY>";
     }
 
     @Override

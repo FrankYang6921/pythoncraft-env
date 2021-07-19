@@ -1,10 +1,8 @@
 package top.frankyang.pre.loader.core;
 
-import top.frankyang.pre.gui.PackageManagerFrame;
 import top.frankyang.pre.loader.exceptions.*;
 import top.frankyang.pre.main.PythonCraft;
 import top.frankyang.pre.misc.FileOnlyVisitor;
-import top.frankyang.pre.util.Packages;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -13,23 +11,23 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class PackageLoader implements AutoCloseable, Closeable {
     private final PackageMap packages = new PackageMap();
-    private final Path scriptsRoot;
+    private final Path packagesRoot;
     private boolean isClosed = false;
 
-    public PackageLoader(Path scriptsRoot) {
-        this.scriptsRoot = scriptsRoot;
+    public PackageLoader(Path packagesRoot) {
+        this.packagesRoot = packagesRoot;
         try {
-            Files.createDirectories(scriptsRoot);
+            Files.createDirectories(packagesRoot);
         } catch (IOException e) {
             throw new RuntimeIOException(
-                "Access denied when creating scripts root.", e
+                "Access denied when creating packages root.", e
             );
         }
     }
@@ -56,17 +54,17 @@ public class PackageLoader implements AutoCloseable, Closeable {
         if (isClosed)
             throw new IllegalStateException("The loader is already closed.");
 
-        List<Path> paths = new ArrayList<>();
+        ArrayList<Path> paths = new ArrayList<>();
 
         try {
             Files.walkFileTree(
-                scriptsRoot, (FileOnlyVisitor<Path>) p -> {
+                packagesRoot, (FileOnlyVisitor<Path>) p -> {
                     if (p.getFileName().toString().endsWith(".zip")) paths.add(p);
                 }
             );
         } catch (IOException e) {
             throw new RuntimeIOException(
-                "Access denied when iterating scripts root.", e
+                "Access denied when iterating packages root.", e
             );
         }
 
@@ -90,13 +88,13 @@ public class PackageLoader implements AutoCloseable, Closeable {
 
         try {  // Adds stub for disabled ones
             Files.walkFileTree(
-                scriptsRoot, (FileOnlyVisitor<Path>) p -> {
+                packagesRoot, (FileOnlyVisitor<Path>) p -> {
                     if (p.getFileName().toString().endsWith(".zip.disabled")) paths.add(p);
                 }
             );
         } catch (IOException e) {
             throw new RuntimeIOException(
-                "Access denied when iterating scripts root.", e
+                "Access denied when iterating packages root.", e
             );
         }
 
@@ -111,17 +109,15 @@ public class PackageLoader implements AutoCloseable, Closeable {
         if (isClosed)
             throw new IllegalStateException("The loader is already closed.");
 
-        Map<Package, Future<?>> futures = new HashMap<>();
+        HashMap<Package, Future<?>> futures = new HashMap<>();
 
         for (Package pkg : packages) {
-            futures.put(pkg, pkg.onConstruction(PythonCraft.getInstance().getPythonExecutor()));
+            futures.put(pkg, pkg.onConstruction(PythonCraft.getInstance().getPythonThreadPool()));
         }
 
-        for (Package pkg : packages) {
-            Future<?> future = futures.get(pkg);
-
+        futures.forEach((pkg, future) -> {
             try {
-                future.get(60, TimeUnit.SECONDS);
+                future.get(60, SECONDS);
             } catch (InterruptedException e) {
                 throw new ImpossibleException(
                     "The package loader thread got an external interrupt.", e
@@ -137,7 +133,7 @@ public class PackageLoader implements AutoCloseable, Closeable {
                         "' cannot be initialized since its entrypoint blocked for over 1 minute.", e, pkg.getPackageSrc()
                 );
             }
-        }
+        });
     }
 
     private void unloadPackages() {
@@ -145,19 +141,19 @@ public class PackageLoader implements AutoCloseable, Closeable {
 
         for (Iterator<Package> iterator = packages.iterator(); iterator.hasNext(); ) {
             Package pkg = iterator.next();
-            futures.add(pkg.onDestruction(PythonCraft.getInstance().getPythonExecutor()));
+            futures.add(pkg.onDestruction(PythonCraft.getInstance().getPythonThreadPool()));
             iterator.remove();
         }
 
         for (Future<?> future : futures) {
             try {
-                future.get(60, TimeUnit.SECONDS);
+                future.get(60, SECONDS);
             } catch (Exception ignored) {
             }  // Ignores all the exceptions.
         }
     }
 
-    private void handleException(Throwable throwable, Consumer<Path> srcConsumer){
+    private void handleException(Throwable throwable, Consumer<Path> srcConsumer) {
         if (throwable instanceof PackageException) {  // Gives reason
             srcConsumer.accept(((PackageException) throwable).getCauseSrc());
         } else {

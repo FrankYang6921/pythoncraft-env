@@ -7,6 +7,6 @@ import java.nio.file.Path;
 
 public class Pack extends ModNioResourcePack {
     public Pack(String identifier, Path path) {
-        super(new FakeMetadata(identifier), path, null, null, true);
+        super(new FakeMetadata(identifier), path, null, null);
     }
 }

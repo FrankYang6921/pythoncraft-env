@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 public final class Packages {
     private Packages() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     public static Path disable(Path src) {

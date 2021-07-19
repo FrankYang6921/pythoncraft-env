@@ -33,9 +33,9 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
         innerText.setText(stackTrace);
         JScrollPane outerText = new JScrollPane(innerText);
 
-        JButton ignore = new MineButton("忽略这个错误");
-        JButton disable = new MineButton("禁用这个包");
-        JButton crash = new MineButton("退出Minecraft");
+        MineButton ignore = new MineButton("忽略这个错误");
+        MineButton disable = new MineButton("禁用这个包");
+        MineButton crash = new MineButton("退出Minecraft");
         if (src == null) {
             disable.setEnabled(false);
         }
@@ -63,14 +63,10 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
         setVisible(true);
     }
 
-    public static ExceptionStatus open(Throwable throwable, Path src) {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter pw = new PrintWriter(stringWriter);
-        throwable.printStackTrace(pw);
-        String english = stringWriter.getBuffer().toString();
-        String chinese = StackTraces.translate(english);
-
-        PackageExceptionFrame frame = new PackageExceptionFrame(chinese, src);
+    public static ExceptionStatus open(Throwable e, Path src) {
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer));
+        PackageExceptionFrame frame = new PackageExceptionFrame(StackTraces.translate(writer.toString()), src);
         frame.waitForClose();
         return frame.result;
     }

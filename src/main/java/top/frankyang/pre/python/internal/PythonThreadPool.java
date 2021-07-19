@@ -6,8 +6,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 public class PythonThreadPool implements PythonExecutor {
     private final ThreadPoolExecutor executor;
+
+    public PythonThreadPool() {
+        this(0, 2147483647, 60, SECONDS);
+    }
 
     public PythonThreadPool(int minPythonCount, int maxPythonCount, long keepAliveTime, TimeUnit unit) {
         executor = new ThreadPoolExecutor(

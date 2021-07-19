@@ -10,6 +10,7 @@ import java.util.zip.ZipFile;
 
 public final class ZipFiles {
     private ZipFiles() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     public static void uncompress(File srcFile, Path dstPath) throws IOException {

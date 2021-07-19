@@ -26,7 +26,7 @@ public abstract class TitleScreenInjector extends Screen {
             98,
             20,
             new LiteralText("PythonCraft 模组"),
-            button -> PythonCraft.getInstance().getPackageManager().openManagerWindow()
+            button -> PythonCraft.getInstance().getPackageManager().openManagerFrame()
         ));
     }
 }

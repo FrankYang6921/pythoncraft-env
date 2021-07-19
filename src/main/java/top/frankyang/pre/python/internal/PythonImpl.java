@@ -7,15 +7,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.python.core.Py.newStringOrUnicode;
 
-public class IndividualPythonImpl extends PythonInterpreter implements Python {
+public class PythonImpl extends PythonInterpreter implements Python {
     private final AtomicInteger pythonPathCount = new AtomicInteger();
 
-    public IndividualPythonImpl() {
+    public PythonImpl() {
         super(null, new PySystemState());
     }
 
     /**
      * Changes the class loader of this python interpreter to the specified one.
+     *
      * @param classLoader the specified class loader
      */
     public void setClassLoader(ClassLoader classLoader) {
@@ -24,6 +25,7 @@ public class IndividualPythonImpl extends PythonInterpreter implements Python {
 
     /**
      * Adds an additional Python path to this python interpreter.
+     *
      * @param path the additional Python path
      */
     public void pushPythonPath(String path) {

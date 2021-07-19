@@ -19,6 +19,7 @@ public final class Digests {
     }
 
     private Digests() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
     public static String digestMD5(String string) {

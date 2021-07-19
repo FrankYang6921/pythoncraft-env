@@ -3,9 +3,12 @@ package top.frankyang.pre.python.providers;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import top.frankyang.pre.python.internal.IndividualPythonImpl;
+import org.python.core.Py;
+import top.frankyang.pre.api.core.API;
 import top.frankyang.pre.python.internal.Python;
+import top.frankyang.pre.python.internal.PythonImpl;
 import top.frankyang.pre.python.internal.PythonProvider;
+import top.frankyang.pre.util.StackTraces;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -24,10 +27,11 @@ public class StandaloneProvider implements PythonProvider {
 
     @Override
     public Python newPython() {
-        IndividualPythonImpl python = new IndividualPythonImpl();
+        PythonImpl python = new PythonImpl();
         python.setErr(out);
         python.setOut(out);
         python.pushPythonPath(path);  // Adds the parent path of the file to the Python path, so that you can do some imports.
+        python.getSystemState().builtins.__setitem__("API", Py.java2py(API.getPublicInstance()));
         return python;
     }
 
@@ -41,19 +45,18 @@ public class StandaloneProvider implements PythonProvider {
     @Override
     public void whenResolved(Python python) {
         sendBufferToFeedback();
-        context.getSource().sendFeedback(new LiteralText(
-            "A PythonCraft script is executed and no catchable exceptions are caught."
-        ), true);
+        context.getSource().sendFeedback(new LiteralText("执行了一个Python脚本，没有捕获到异常。"), true);
     }
 
     @Override
     public void whenRejected(Exception e) {
         sendBufferToFeedback();
-        context.getSource().sendFeedback(new LiteralText(
-            "A PythonCraft script is executed but the following exceptions are caught."
-        ), true);
+        context.getSource().sendFeedback(new LiteralText("执行了一个Python脚本，捕获了如下异常。"), true);
+        // Prints the stack trace of the exception.
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
-        context.getSource().sendFeedback(new LiteralText(writer.toString()), true);
+        context.getSource().sendError(
+            new LiteralText(StackTraces.translate(writer.toString()))
+        );
     }
 }
