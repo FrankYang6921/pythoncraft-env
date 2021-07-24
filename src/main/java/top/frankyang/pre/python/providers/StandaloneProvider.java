@@ -52,11 +52,8 @@ public class StandaloneProvider implements PythonProvider {
     public void whenRejected(Exception e) {
         sendBufferToFeedback();
         context.getSource().sendFeedback(new LiteralText("执行了一个Python脚本，捕获了如下异常。"), true);
-        // Prints the stack trace of the exception.
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
         context.getSource().sendError(
-            new LiteralText(StackTraces.translate(writer.toString()))
+            new LiteralText(StackTraces.translate(e))
         );
     }
 }

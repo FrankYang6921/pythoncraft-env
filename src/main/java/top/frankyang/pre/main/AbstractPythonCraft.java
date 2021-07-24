@@ -3,13 +3,14 @@ package top.frankyang.pre.main;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.loader.api.Version;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import top.frankyang.pre.misc.Version;
 import top.frankyang.pre.python.internal.PythonThreadPool;
 import top.frankyang.pre.python.providers.StandaloneProvider;
+import top.frankyang.pre.util.Versions;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
@@ -25,7 +26,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 abstract class AbstractPythonCraft {
     protected final Logger logger = LogManager.getLogger();
-    protected final Version version = new Version("0.1.0");
+    protected final Version version = Versions.of("0.1.0");
     protected final PythonThreadPool pythonThreadPool = new PythonThreadPool();
     private boolean looseMode = true;
 

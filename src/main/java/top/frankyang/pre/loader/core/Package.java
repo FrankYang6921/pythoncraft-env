@@ -6,13 +6,11 @@ import java.nio.file.Path;
 import java.util.concurrent.Future;
 
 public interface Package {
-    Path getPackageRoot();
-
     Path getPackageSrc();
 
     MetaData getMetaData();
 
-    boolean isDummy();
+    boolean isPlaceholder();
 
     Future<?> onConstruction(PythonExecutor executor);
 

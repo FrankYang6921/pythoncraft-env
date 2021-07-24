@@ -1,11 +1,24 @@
 package top.frankyang.pre.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StackTraces {
     private StackTraces() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
+    public static String getString(Throwable throwable) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        throwable.printStackTrace(printWriter);
+        return stringWriter.toString();
+    }
+
+    public static String translate(Throwable throwable) {
+        return translate(getString(throwable));
     }
 
     public static String translate(String stackTrace) {
@@ -31,7 +44,7 @@ public final class StackTraces {
         matcher = pattern.matcher(stackTrace);
         while (matcher.find()) {
             stackTrace = stackTrace.replace(
-                matcher.group(0), "\n\t……省略了" + matcher.group(1) + "条内部调用（对调试没有影响）"
+                matcher.group(0), "\n\t……省略了" + matcher.group(1) + "条调用"
             );
         }
         pattern = Pattern.compile("\\n\\s+File \"([\\s\\S]+?)\", line ([0-9]+), in (.+)");

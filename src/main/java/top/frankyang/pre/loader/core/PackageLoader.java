@@ -46,7 +46,7 @@ public class PackageLoader implements AutoCloseable, Closeable {
             isClosed = true;
         } catch (Throwable throwable) {
             handleException(throwable, proxy::onException);
-            throw throwable;
+            throw new RuntimeException(throwable);
         }
     }
 
@@ -98,10 +98,12 @@ public class PackageLoader implements AutoCloseable, Closeable {
             );
         }
 
+        if (paths.isEmpty()) return;
+
         PythonCraft.getInstance().getLogger().info(paths.size() + " package(s) is/are disabled.");
 
         for (Path path : paths) {
-            packages.put(new DummyPackage(path));
+            packages.put(new PackagePlaceholder(path));
         }
     }
 
@@ -120,7 +122,7 @@ public class PackageLoader implements AutoCloseable, Closeable {
                 future.get(60, SECONDS);
             } catch (InterruptedException e) {
                 throw new ImpossibleException(
-                    "The package loader thread got an external interrupt.", e
+                    "A package loader thread has got an external interrupt.", e
                 );
             } catch (ExecutionException e) {
                 throw new PkgLoadException(

@@ -6,20 +6,13 @@ import top.frankyang.pre.python.internal.PythonExecutor;
 import java.nio.file.Path;
 import java.util.concurrent.Future;
 
-public class DummyPackage implements Package {
-    private final Path packageRoot;
+public class PackagePlaceholder implements Package {
     private final Path packageSrc;
     private final MetaData metaData;
 
-    public DummyPackage(Path src) {
-        packageSrc = src;
-        packageRoot = src.getParent();
-        metaData = new MetaData(src);
-    }
-
-    @Override
-    public Path getPackageRoot() {
-        return packageRoot;
+    public PackagePlaceholder(Path packageSrc) {
+        this.packageSrc = packageSrc;
+        metaData = MetaDataPlaceholder.getInstance();
     }
 
     @Override
@@ -33,7 +26,7 @@ public class DummyPackage implements Package {
     }
 
     @Override
-    public boolean isDummy() {
+    public boolean isPlaceholder() {
         return true;
     }
 

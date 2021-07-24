@@ -1,61 +1,73 @@
 package top.frankyang.pre.loader.core;
 
-import top.frankyang.pre.main.PythonCraft;
+import net.minecraft.util.Identifier;
 import top.frankyang.pre.util.Packages;
 
-import javax.swing.*;
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 public class PackageInfo {
-    private final String fullName;
-    private final String description;
+    private final String nameString;
+    private final String infoString;
     private final boolean disabled;
     private final Path packageSrc;
-    private final ImageIcon thumbnail;
+    private final Identifier thumbnail;
+    private final MetaData metaData;
+    private final boolean placeholder;
 
     public PackageInfo(Package pkg) {
-        fullName = pkg
-            .getMetaData()
-            .getFullName();
-        description = pkg
-            .getMetaData()
-            .getDescription();
-        disabled = pkg.isDummy();
+        metaData = pkg.getMetaData();
+        nameString = metaData.getFriendlyName();
+        infoString = metaData.getDescription();
+        disabled = pkg.isPlaceholder();
         packageSrc = pkg.getPackageSrc();
-
-        MetaData meta = pkg.getMetaData();
-        if (meta.hasThumbnail() && Files.exists(meta.getThumbnail()) && meta.getThumbnail().toString().endsWith(".png")) {
-            thumbnail = new ImageIcon(meta.getThumbnail().toString());
-        } else if (disabled) {
-            PythonCraft.getInstance().getLogger().warn("Package " + pkg + "(disabled) does not have a thumbnail.");
-            thumbnail = new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_false.png")));
-        } else {
-            PythonCraft.getInstance().getLogger().warn("Package " + pkg + "(enabled) does not have a thumbnail.");
-            thumbnail = new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_white.png")));
-        }
+        thumbnail = metaData.getThumbnailId();
+        placeholder = pkg.isPlaceholder();
     }
 
-    public PackageInfo(String fullName, String description, boolean disabled, Path packageSrc, ImageIcon thumbnail) {
-        this.fullName = fullName;
-        this.description = description;
+    public PackageInfo(boolean disabled, Path packageSrc, MetaData metaData) {
+        this.nameString = metaData.getFriendlyName();
+        this.infoString = metaData.getDescription();
+        this.disabled = disabled;
+        this.packageSrc = packageSrc;
+        this.thumbnail = metaData.getThumbnailId();
+        this.metaData = metaData;
+        placeholder = true;
+    }
+
+    public PackageInfo(String nameString,
+                       String infoString,
+                       boolean disabled,
+                       Path packageSrc,
+                       Identifier thumbnail,
+                       MetaData metaData) {
+        this.nameString = nameString;
+        this.infoString = infoString;
         this.disabled = disabled;
         this.packageSrc = packageSrc;
         this.thumbnail = thumbnail;
+        this.metaData = metaData;
+        placeholder = true;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getNameString() {
+        return nameString;
     }
 
-    public String getDescription() {
-        return description;
+    public String getInfoString() {
+        return infoString;
     }
 
     public boolean isDisabled() {
         return disabled;
+    }
+
+    public boolean isPlaceholder() {
+        return placeholder;
+    }
+
+    public Path getPackageSrc() {
+        return packageSrc;
     }
 
     public File getPackageDir() {
@@ -66,21 +78,25 @@ public class PackageInfo {
         return packageSrc.getFileName().toString();
     }
 
-    public ImageIcon getThumbnail() {
+    public Identifier getThumbnail() {
         return thumbnail;
+    }
+
+    public MetaData getMetaData() {
+        return metaData;
     }
 
     public PackageInfo disable() {
         if (disabled)
             throw new UnsupportedOperationException();
         Path src = Packages.disable(packageSrc);
-        return new PackageInfo(fullName, description, true, src, new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_false.png"))));
+        return new PackageInfo(true, src, MetaDataPlaceholder.getInstance());
     }
 
     public PackageInfo enable() {
         if (!disabled)
             throw new UnsupportedOperationException();
         Path src = Packages.enable(packageSrc);
-        return new PackageInfo(fullName, description, false, src, new ImageIcon(Objects.requireNonNull(PackageInfo.class.getResource("/assets/pre/icon_white.png"))));
+        return new PackageInfo(false, src, MetaDataPlaceholder.getInstance());
     }
 }

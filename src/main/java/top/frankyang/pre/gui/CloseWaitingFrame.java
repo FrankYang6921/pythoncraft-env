@@ -1,11 +1,10 @@
 package top.frankyang.pre.gui;
 
-import top.frankyang.pre.gui.controls.MineFrame;
-
+import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-public class CloseWaitingFrame extends MineFrame {
+public class CloseWaitingFrame extends JFrame {
     private final Object windowCloseLock = new Object();
 
     public CloseWaitingFrame() {

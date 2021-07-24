@@ -1,133 +1,37 @@
 package top.frankyang.pre.loader.core;
 
-import top.frankyang.pre.misc.Version;
+import net.fabricmc.loader.util.version.SemanticVersionImpl;
+import net.minecraft.util.Identifier;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-public class MetaData {
-    private final Path entrypoint;
-    private final String identifier;
-    private final String friendlyName;
-    private final String description;
-    private final Path thumbnail;
-    private final Version packageVersion;
-    private final Version gameVersion;
-    private final Version fabricVersion;
-    private final Version loaderVersion;
-    private final List<Path> classPaths;
-    private final List<Path> assetPaths;
+public interface MetaData {
+    boolean hasThumbnail();
 
-    MetaData(Path packageSrc) {
-        entrypoint = thumbnail = null;
-        identifier = description = friendlyName = packageSrc.getFileName().toString().replace(".disabled", "");  //q Don't show .disabled
-        packageVersion = gameVersion = fabricVersion = loaderVersion = Version.ANY;
-        classPaths = Collections.emptyList();
-        assetPaths = Collections.emptyList();
-    }
+    String getFullName();
 
-    public MetaData(MetaDataWrapper wrapper, Path packageRoot) {
-        entrypoint = packageRoot.resolve(
-            Objects.requireNonNull(wrapper.getEntrypoint(), "Missing key: 'entrypoint' in metadata")
-        );
+    Path getEntrypoint();
 
-        identifier =
-            Objects.requireNonNull(wrapper.getIdentifier(), "Missing key: 'identifier' in metadata.");
+    String getIdentifier();
 
-        String friendlyName = wrapper.getFriendlyName();
-        this.friendlyName = friendlyName != null ? friendlyName : identifier;
+    String getFriendlyName();
 
-        String description = wrapper.getDescription();
-        this.description = description != null ? description : identifier;
+    String getDescription();
 
-        String thumbnailPath = wrapper.getThumbnailPath();
-        this.thumbnail = thumbnailPath != null ? packageRoot.resolve(wrapper.getThumbnailPath()) : null;
+    Identifier getThumbnailId();
 
-        packageVersion = new Version(Objects.requireNonNull(
-            wrapper.getPackageVersion(), "Missing key: 'packageVersion' in metadata."
-        ));
+    Path getThumbnailPath();
 
-        String version = wrapper.getGameVersion();
-        gameVersion = version != null ? new Version(version) : Version.ANY;
+    SemanticVersionImpl getPackageVersion();
 
-        version = wrapper.getFabricVersion();
-        fabricVersion = version != null ? new Version(version) : Version.ANY;
+    SemanticVersionImpl getGameVersion();
 
-        version = wrapper.getLoaderVersion();
-        loaderVersion = version != null ? new Version(version) : Version.ANY;
+    SemanticVersionImpl getFabricVersion();
 
-        if (wrapper.getClassPaths() != null)
-            classPaths = Arrays.stream(wrapper.getClassPaths())
-                .map(packageRoot::resolve)
-                .collect(Collectors.toList());
-        else
-            classPaths = Collections.emptyList();
+    SemanticVersionImpl getLoaderVersion();
 
-        if (wrapper.getAssetPaths() != null)
-            assetPaths = Arrays.stream(wrapper.getAssetPaths())
-                .map(packageRoot::resolve)
-                .collect(Collectors.toList());
-        else
-            assetPaths = Collections.emptyList();
-    }
+    List<Path> getClassPaths();
 
-    public boolean hasThumbnail() {
-        return thumbnail != null;
-    }
-
-    public String getFullName() {
-        return String.format(
-            "%s[%s]",
-            getFriendlyName(),
-            getIdentifier()
-        );
-    }
-
-    public Path getEntrypoint() {
-        return this.entrypoint;
-    }
-
-    public String getIdentifier() {
-        return this.identifier;
-    }
-
-    public String getFriendlyName() {
-        return this.friendlyName;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public Path getThumbnail() {
-        return this.thumbnail;
-    }
-
-    public Version getPackageVersion() {
-        return this.packageVersion;
-    }
-
-    public Version getGameVersion() {
-        return this.gameVersion;
-    }
-
-    public Version getFabricVersion() {
-        return this.fabricVersion;
-    }
-
-    public Version getLoaderVersion() {
-        return this.loaderVersion;
-    }
-
-    public List<Path> getClassPaths() {
-        return this.classPaths;
-    }
-
-    public List<Path> getAssetPaths() {
-        return this.assetPaths;
-    }
+    List<Path> getAssetPaths();
 }

@@ -13,12 +13,10 @@ import java.nio.file.Path;
 import java.util.concurrent.Future;
 
 public class PackageImpl implements Package {
-    private final Path packageRoot;
     private final Path packageSrc;
     private final MetaData metaData;
 
     PackageImpl(Path packageRoot, Path packageSrc) {
-        this.packageRoot = packageRoot;
         this.packageSrc = packageSrc;
         MetaDataWrapper wrapper;
         try {
@@ -32,15 +30,10 @@ public class PackageImpl implements Package {
         }
 
         try {
-            metaData = new MetaData(wrapper, packageRoot);
+            metaData = new MetaDataImpl(wrapper, packageRoot);
         } catch (NullPointerException e) {
             throw new PkgMetaException("Incomplete meta.json, not a valid PythonCraft package.", e);
         }
-    }
-
-    @Override
-    public Path getPackageRoot() {
-        return packageRoot;
     }
 
     @Override
@@ -54,7 +47,7 @@ public class PackageImpl implements Package {
     }
 
     @Override
-    public boolean isDummy() {
+    public boolean isPlaceholder() {
         return false;
     }
 

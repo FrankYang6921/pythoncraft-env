@@ -28,6 +28,10 @@ dependencies {
     // https://mvnrepository.com/artifact/org.python/jython-standalone
     include 'org.python:jython-standalone:2.7.2'
     implementation 'org.python:jython-standalone:2.7.2'
+
+    // LibGui made by CottonMC.
+    include 'io.github.cottonmc:LibGui:3.4.0+1.16.5'
+    modImplementation 'io.github.cottonmc:LibGui:3.4.0+1.16.5'
 }
 
 processResources {
@@ -86,6 +90,9 @@ publishing {
 repositories {
     maven {
         url 'https://maven.aliyun.com/repository/public/'
+    }
+    maven {
+        url 'https://server.bbkr.space/artifactory/libs-release'
     }
     mavenLocal()
     mavenCentral()

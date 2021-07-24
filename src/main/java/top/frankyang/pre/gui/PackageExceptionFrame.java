@@ -1,13 +1,10 @@
 package top.frankyang.pre.gui;
 
-import top.frankyang.pre.gui.controls.*;
 import top.frankyang.pre.loader.ExceptionStatus;
 import top.frankyang.pre.util.StackTraces;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Path;
 
 public final class PackageExceptionFrame extends CloseWaitingFrame {
@@ -17,35 +14,56 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
         super();
 
         setSize(800, 600);
-        setResizable(false);
+        setIconImage(Constants.getIcon().getImage());
+        setTitle("PythonCraft Runtime Environment");
 
-        String string = "PythonCraft Loader出错了：在加载" +
+        String string = "PythonCraftRE出错了：在加载或运行" +
             (src == null ? "未知的包" : "来自“" + src + "”的包") +
             "时，PythonCraft捕获了一个异常。你可以禁用这个包，然后重新加载其余的包，" +
             "或者不禁用这个包，然后重新加载所有的包，亦或是退出Minecraft。下方的文本" +
             "框中是所捕获异常的调用栈。调用栈也会被记录在Minecraft的日志文件中供参考。" +
             "如果你认为这个异常是因PythonCraft的漏洞而产生的，请联系原作者汇报漏洞:)";
 
-        MineText label = new MineText(string);
+        Box labelWrapper = Box.createHorizontalBox();
+        JLabel label = new JLabel("<html>" + string + "</html>");
+        labelWrapper.add(label);
 
-        MineTextArea innerText = new MineTextArea();
+        JTextArea innerText = new JTextArea();
+        innerText.setLineWrap(false);
         innerText.setEditable(false);
         innerText.setText(stackTrace);
-        JScrollPane outerText = new JScrollPane(innerText);
+        JScrollPane textWrapper = new JScrollPane(innerText);
 
-        MineButton ignore = new MineButton("忽略这个错误");
-        MineButton disable = new MineButton("禁用这个包");
-        MineButton crash = new MineButton("退出Minecraft");
+        JButton ignore = new JButton("忽略这个错误");
+        JButton disable = new JButton("禁用这个包");
+        JButton crash = new JButton("退出Minecraft");
         if (src == null) {
             disable.setEnabled(false);
         }
 
-        MinePanel buttons = new MinePanel(ignore, disable, crash);
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setLayout(new FlowLayout() {{
+            setHgap(Constants.PADDING_WIDTH);
+            setVgap(0);
+        }});
+        buttonWrapper.add(ignore);
+        buttonWrapper.add(disable);
+        buttonWrapper.add(crash);
 
-        add(new MineVBox(
-            new Dimension(Constants.PADDING_WIDTH, Constants.PADDING_HEIGHT),
-            label, outerText, buttons
-        ));
+        Box outer = Box.createHorizontalBox();
+        Box box = Box.createVerticalBox();
+        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        box.add(labelWrapper);
+        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        box.add(textWrapper);
+        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        box.add(buttonWrapper);
+        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        outer.add(Box.createHorizontalStrut(Constants.PADDING_WIDTH));
+        outer.add(box);
+        outer.add(Box.createHorizontalStrut(Constants.PADDING_WIDTH));
+
+        add(outer);
 
         ignore.addActionListener(e -> {
             result = ExceptionStatus.IGNORE;
@@ -63,10 +81,8 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
         setVisible(true);
     }
 
-    public static ExceptionStatus open(Throwable e, Path src) {
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
-        PackageExceptionFrame frame = new PackageExceptionFrame(StackTraces.translate(writer.toString()), src);
+    public static ExceptionStatus open(Throwable throwable, Path src) {
+        PackageExceptionFrame frame = new PackageExceptionFrame(StackTraces.translate(throwable), src);
         frame.waitForClose();
         return frame.result;
     }

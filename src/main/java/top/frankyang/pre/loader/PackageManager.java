@@ -1,6 +1,6 @@
 package top.frankyang.pre.loader;
 
-import top.frankyang.pre.gui.PackageManagerFrame;
+import top.frankyang.pre.gui.PackageManagerGui;
 import top.frankyang.pre.loader.core.Package;
 import top.frankyang.pre.loader.core.*;
 import top.frankyang.pre.loader.exceptions.ImpossibleException;
@@ -59,21 +59,7 @@ public class PackageManager {
         if (managerStatus == ManagerStatus.EMPTY || managerStatus == ManagerStatus.FAILED)
             throw new IllegalStateException("This manager is not loaded or failed.");
 
-        if (managerFrameOpen) {
-            PackageManagerFrame.raise();
-            return;
-        }
-
-        Thread thread = new Thread(() -> {
-            managerFrameOpen = true;
-            try {
-                PackageManagerFrame.open(packageLoader.getPackages().stream().map(PackageInfo::new));
-            } finally {
-                managerFrameOpen = false;
-            }
-        });
-        thread.setDaemon(true);
-        thread.start();
+        PackageManagerGui.open(packageLoader.getPackages().stream().map(PackageInfo::new));
     }
 
     public void construct() {
@@ -125,7 +111,7 @@ public class PackageManager {
         try (PackageLoader loader = loaderSupplier.get()) {
             loader.loadFromRoot(new LoaderProxy() {
                 @Override
-                public void afterLoad(PackageLoader loader) {
+                public void afterLoad(PackageLoader loader) throws IOException {
                     userClassURLs.set(prepareUserStuffs(loader));
                 }
 
@@ -154,20 +140,30 @@ public class PackageManager {
         }
     }
 
-    private URL[] prepareUserStuffs(PackageLoader loader) {
+    private URL[] prepareUserStuffs(PackageLoader loader) throws IOException {
+        Path path = Files.createTempDirectory("thumbnail-");
+
         for (Package p : loader.getPackages()) {  // Iterate over all the packages
-            for (Path asset : p.getMetaData().getAssetPaths()) {  // Add the asset paths
+            for (Path asset : p.getMetaData().getAssetPaths()) {  // Add the asset paths as packs.
                 userResourcePacks.add(
                     new Pack(p.getMetaData().getIdentifier(), asset)
                 );
-                try {
-                    Files.createFile(asset.resolve("fabric.mod.json"));  // Fools fabric ;)
-                } catch (IOException e) {
-                    throw new RuntimeIOException(e);
-                }
+                Files.createFile(asset.resolve("fabric.mod.json"));
+            }
+            if (p.getMetaData().hasThumbnail()) {
+                Path textures = Files.createDirectories(
+                    path.resolve("assets").resolve(p.getMetaData().getIdentifier())
+                );
+                Files.copy(
+                    p.getMetaData().getThumbnailPath(), textures.resolve("thumbnail.png")
+                );
             }
             userClassPaths.addAll(p.getMetaData().getClassPaths());  // Add the class paths
         }
+
+        userResourcePacks.add(new Pack("pre", path));
+        Files.createFile(path.resolve("fabric.mod.json"));
+        path.toFile().deleteOnExit();
 
         URL[] userClassURLs = ClassLoaders.pathsToURLs(userClassPaths);
         userClassLoader = new URLClassLoader(

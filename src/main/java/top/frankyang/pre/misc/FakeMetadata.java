@@ -68,12 +68,12 @@ public class FakeMetadata implements ModMetadata {
 
     @Override
     public String getName() {
-        return "<DUMMY>";
+        return id;
     }
 
     @Override
     public String getDescription() {
-        return "<DUMMY>";
+        return "";
     }
 
     @Override

@@ -2,9 +2,10 @@ package top.frankyang.pre.api;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.FabricLoader;
+import net.fabricmc.loader.util.version.SemanticVersionImpl;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
-import top.frankyang.pre.misc.Version;
+import top.frankyang.pre.util.Versions;
 
 import java.nio.file.Path;
 
@@ -116,8 +117,8 @@ public final class Minecraft {
      *
      * @return 当前游戏的版本号。
      */
-    public static Version getGameVersion() {
-        return new Version(
+    public static SemanticVersionImpl getGameVersion() {
+        return Versions.of(
             getFabricLoader().getGameProvider().getNormalizedGameVersion().split("-")[0]
         );
     }
