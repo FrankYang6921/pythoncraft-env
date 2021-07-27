@@ -18,9 +18,9 @@ public final class Versions {
     }
 
     public static SemanticVersionImpl ofNullable(String string) {
-       if (string == null)
-           return ANY;
-       return of(string);
+        if (string == null)
+            return ANY;
+        return of(string);
     }
 
     public static String toString(SemanticVersionImpl version) {

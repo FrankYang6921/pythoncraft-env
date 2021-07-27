@@ -18,7 +18,7 @@ public final class Minecraft {
     }
 
     @SuppressWarnings("deprecation")
-    private static FabricLoader getFabricLoader() {
+    public static FabricLoader getFabricLoader() {
         return FabricLoader.INSTANCE;
     }
 

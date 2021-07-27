@@ -8,12 +8,13 @@ import net.minecraft.util.registry.Registry;
 import org.python.core.PyDictionary;
 import top.frankyang.pre.api.AbstractRegistry;
 import top.frankyang.pre.api.item.ItemSettings;
+import top.frankyang.pre.api.misc.Convertable;
 
 
 /**
  * 方块注册表。在某一个PythonCraft包的命名空间内注册方块。
  */
-public class BlockRegistry extends AbstractRegistry {
+public final class BlockRegistry extends AbstractRegistry {
     public BlockRegistry(String namespace) {
         super(namespace);
     }
@@ -37,8 +38,8 @@ public class BlockRegistry extends AbstractRegistry {
      * @param id    方块的命名空间ID。
      * @param block 所要注册的方块实例。
      */
-    public void registerBlockOnly(String id, Block block) {
-        Registry.register(Registry.BLOCK, new Identifier(id), block);
+    public void registerBlockOnly(String id, Object block) {
+        Registry.register(Registry.BLOCK, new Identifier(id), Convertable.convert(block, Block.class));
     }
 
     /**
@@ -48,7 +49,7 @@ public class BlockRegistry extends AbstractRegistry {
      * @param blockSettings 所要注册的方块设置（Python字典，会自动解析设置并创建方块实例）。
      */
     public void registerBlockOnly(String id, PyDictionary blockSettings) {
-        registerBlockOnly(id, new Block(BlockSettings.parse(blockSettings)));
+        registerBlockOnly(id, new Block(BlockSettings.of(blockSettings).convert()));
     }
 
     /**
@@ -58,9 +59,9 @@ public class BlockRegistry extends AbstractRegistry {
      * @param block 所要注册的方块实例。
      * @param item  所要注册的方块物品实例。
      */
-    public void registerBlock(String id, Block block, BlockItem item) {
-        Registry.register(Registry.BLOCK, getIdentifier(id), block);
-        Registry.register(Registry.ITEM, getIdentifier(id), item);
+    public void registerBlock(String id, Object block, Object item) {
+        Registry.register(Registry.BLOCK, getIdentifier(id), Convertable.convert(block, Block.class));
+        Registry.register(Registry.ITEM, getIdentifier(id), Convertable.convert(item, BlockItem.class));
     }
 
     /**
@@ -74,8 +75,8 @@ public class BlockRegistry extends AbstractRegistry {
         Block block;
         registerBlock(
             id,
-            block = new Block(BlockSettings.parse(blockSettings)),
-            new BlockItem(block, ItemSettings.parse(itemSettings))
+            block = new Block(BlockSettings.of(blockSettings).convert()),
+            new BlockItem(block, ItemSettings.parse(itemSettings).convert())
         );
     }
 

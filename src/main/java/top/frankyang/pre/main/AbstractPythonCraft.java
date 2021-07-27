@@ -26,7 +26,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 abstract class AbstractPythonCraft {
     protected final Logger logger = LogManager.getLogger();
-    protected final Version version = Versions.of("0.1.0");
+    protected final Version version = Versions.of("0.1.1");
     protected final PythonThreadPool pythonThreadPool = new PythonThreadPool();
     private boolean looseMode = true;
 

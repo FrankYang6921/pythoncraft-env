@@ -12,9 +12,9 @@ import top.frankyang.pre.main.PythonCraft;
 
 import java.util.List;
 
-@Mixin(ModResourcePackUtil.class)
+@Mixin(value = ModResourcePackUtil.class, remap = false)
 public class ResourcePackInjector {
-    @Inject(method = "appendModResourcePacks", at = @At("TAIL"), remap = false)
+    @Inject(method = "appendModResourcePacks", at = @At("TAIL"))
     private static void appendModResourcePacks(List<ModResourcePack> packs, ResourceType type, @Nullable String subPath, CallbackInfo ci) {
         packs.addAll(PythonCraft.getInstance().getPackageManager().getUserResourcePacks());
     }

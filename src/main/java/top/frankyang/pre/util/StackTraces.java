@@ -10,7 +10,7 @@ public final class StackTraces {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static String getString(Throwable throwable) {
+    public static String toString(Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         throwable.printStackTrace(printWriter);
@@ -18,7 +18,7 @@ public final class StackTraces {
     }
 
     public static String translate(Throwable throwable) {
-        return translate(getString(throwable));
+        return translate(toString(throwable));
     }
 
     public static String translate(String stackTrace) {

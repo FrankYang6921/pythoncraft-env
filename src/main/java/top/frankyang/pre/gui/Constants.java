@@ -1,11 +1,6 @@
 package top.frankyang.pre.gui;
 
-import top.frankyang.pre.loader.exceptions.RuntimeIOException;
-
 import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
 import java.util.function.Supplier;
 

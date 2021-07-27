@@ -10,7 +10,6 @@ import top.frankyang.pre.python.internal.PythonImpl;
 import top.frankyang.pre.python.internal.PythonProvider;
 import top.frankyang.pre.util.StackTraces;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Paths;

@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.List;
 
 public class MetaDataPlaceholder implements MetaData {
-    public static MetaDataPlaceholder getInstance() {
-        return MetaDataPlaceholderSingleton.INSTANCE;
+    protected MetaDataPlaceholder() {
     }
 
-    protected MetaDataPlaceholder() {
+    public static MetaDataPlaceholder getInstance() {
+        return MetaDataPlaceholderSingleton.INSTANCE;
     }
 
     @Override

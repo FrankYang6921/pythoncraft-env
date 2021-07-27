@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
+import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class PackageLoader implements AutoCloseable, Closeable {
@@ -119,7 +120,7 @@ public class PackageLoader implements AutoCloseable, Closeable {
 
         futures.forEach((pkg, future) -> {
             try {
-                future.get(60, SECONDS);
+                future.get(1, HOURS);
             } catch (InterruptedException e) {
                 throw new ImpossibleException(
                     "A package loader thread has got an external interrupt.", e

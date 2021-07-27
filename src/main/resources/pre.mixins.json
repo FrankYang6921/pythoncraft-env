@@ -6,6 +6,7 @@
   "mixins": [
     "ClientBrandInjector",
     "ClientWindowAccessor",
+    "PythonSystemInjector",
     "RenderSystemInjector",
     "ResourcePackInjector",
     "TitleScreenInjector"

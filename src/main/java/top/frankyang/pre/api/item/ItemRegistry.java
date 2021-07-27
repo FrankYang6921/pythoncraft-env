@@ -1,19 +1,17 @@
 package top.frankyang.pre.api.item;
 
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.python.core.PyDictionary;
 import top.frankyang.pre.api.AbstractRegistry;
+import top.frankyang.pre.api.misc.Convertable;
 
 /**
  * 物品注册表。在某一个PythonCraft包的命名空间内注册物品。
  */
-public class ItemRegistry extends AbstractRegistry {
+public final class ItemRegistry extends AbstractRegistry {
     public ItemRegistry(String namespace) {
         super(namespace);
     }
@@ -37,8 +35,8 @@ public class ItemRegistry extends AbstractRegistry {
      * @param id   所注册物品的命名空间ID。
      * @param item 所要注册的物品实例。
      */
-    public void registerItem(String id, Item item) {
-        Registry.register(Registry.ITEM, getIdentifier(id), item);
+    public synchronized void registerItem(String id, Object item) {
+        Registry.register(Registry.ITEM, getIdentifier(id), Convertable.convert(item, Item.class));
     }
 
     /**
@@ -47,30 +45,8 @@ public class ItemRegistry extends AbstractRegistry {
      * @param id           所注册物品的命名空间ID。
      * @param itemSettings 所要注册的物品设置（Python字典，会自动解析设置并创建物品实例）。
      */
-    public void registerItem(String id, PyDictionary itemSettings) {
-        Registry.register(Registry.ITEM, getIdentifier(id), new Item(ItemSettings.parse(itemSettings)));
-    }
-
-    /**
-     * 注册一个物品组。
-     *
-     * @param id     物品组的命名空间ID。
-     * @param iconId 物品组图标所对应的物品的命名空间ID。
-     * @return 注册的物品组。
-     */
-    public ItemGroup registerGroup(String id, String iconId) {
-        return FabricItemGroupBuilder.create(getIdentifier(id)).icon(() -> new ItemStack(lookup(iconId))).build();
-    }
-
-    /**
-     * 注册一个物品组。
-     *
-     * @param id     物品组的命名空间ID。
-     * @param iconId 物品组图标所对应的物品的命名空间ID。
-     * @return 注册的物品组。
-     */
-    public ItemGroup registerGroup(String id, Identifier iconId) {
-        return FabricItemGroupBuilder.create(getIdentifier(id)).icon(() -> new ItemStack(lookup(iconId))).build();
+    public synchronized void registerItem(String id, PyDictionary itemSettings) {
+        Registry.register(Registry.ITEM, getIdentifier(id), new Item(ItemSettings.parse(itemSettings).convert()));
     }
 
     /**
@@ -80,8 +56,8 @@ public class ItemRegistry extends AbstractRegistry {
      * @return 查询到的物品。
      */
     public Item lookup(String id) {
-        if (id.contains(":")) return
-            lookup(new Identifier(id));
+        if (id.contains(":"))
+            return lookup(new Identifier(id));
         return lookup(getIdentifier(id));
     }
 }
