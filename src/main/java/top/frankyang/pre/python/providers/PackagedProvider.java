@@ -1,7 +1,7 @@
 package top.frankyang.pre.python.providers;
 
 import org.python.core.Py;
-import top.frankyang.pre.api.core.API;
+import top.frankyang.pre.api.core.Api;
 import top.frankyang.pre.loader.core.PackageImpl;
 import top.frankyang.pre.python.internal.Python;
 import top.frankyang.pre.python.internal.PythonImpl;
@@ -25,7 +25,7 @@ public class PackagedProvider implements PythonProvider {
         python.setClassLoader(loader);
         python.pushPythonPath(path);
         python.set("_PACKAGE", pkg);
-        python.getSystemState().builtins.__setitem__("API", Py.java2py(API.getPrivateInstance(pkg)));
+        python.getSystemState().builtins.__setitem__("API", Py.java2py(Api.getDedicatedInstance(pkg)));
         return python;
     }
 }

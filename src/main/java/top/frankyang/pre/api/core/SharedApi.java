@@ -4,8 +4,8 @@ import top.frankyang.pre.api.block.BlockRegistry;
 import top.frankyang.pre.api.item.ItemRegistry;
 import top.frankyang.pre.loader.core.Package;
 
-public class PublicAPI extends API {
-    PublicAPI() {
+public class SharedApi extends Api {
+    SharedApi() {
     }
 
     @Override

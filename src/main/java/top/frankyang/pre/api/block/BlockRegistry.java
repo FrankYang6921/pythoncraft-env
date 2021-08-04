@@ -7,6 +7,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.python.core.PyDictionary;
 import top.frankyang.pre.api.AbstractRegistry;
+import top.frankyang.pre.api.block.type.BaseBlockType;
 import top.frankyang.pre.api.item.ItemSettings;
 import top.frankyang.pre.api.misc.Convertable;
 
@@ -72,12 +73,10 @@ public final class BlockRegistry extends AbstractRegistry {
      * @param itemSettings  所要注册的方块物品设置（Python字典，会自动解析设置并创建方块物品实例）。
      */
     public void registerBlock(String id, PyDictionary blockSettings, PyDictionary itemSettings) {
-        Block block;
+        Block block = new BaseBlockType(BlockSettings.of(blockSettings).convert()).convert();
+
         registerBlock(
-            id,
-            block = new Block(BlockSettings.of(blockSettings).convert()),
-            new BlockItem(block, ItemSettings.parse(itemSettings).convert())
-        );
+            id, block, new BlockItem(block, ItemSettings.parse(itemSettings).convert()));
     }
 
     /**

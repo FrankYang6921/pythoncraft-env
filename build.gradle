@@ -24,12 +24,14 @@ dependencies {
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
-    // Tells Fabric Loom to include it in the JAR and compile with it.
     // https://mvnrepository.com/artifact/org.python/jython-standalone
     include 'org.python:jython-standalone:2.7.2'
     implementation 'org.python:jython-standalone:2.7.2'
 
-    // LibGui made by CottonMC.
+    // https://mvnrepository.com/artifact/cglib/cglib
+    include 'cglib:cglib:3.3.0'
+    implementation 'cglib:cglib:3.3.0'
+
     include 'io.github.cottonmc:LibGui:3.4.0+1.16.5'
     modImplementation 'io.github.cottonmc:LibGui:3.4.0+1.16.5'
 }

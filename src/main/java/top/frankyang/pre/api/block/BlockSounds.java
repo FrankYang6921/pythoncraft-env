@@ -14,8 +14,6 @@ import top.frankyang.pre.api.util.TypedDictionary;
  * 包装类，包装原版类<code>BlockSoundGroup</code>。
  */
 public class BlockSounds extends DelegatedConvertable<BlockSoundGroup> {
-    private static final BlockSounds DEFAULT = new BlockSounds(BlockSoundGroup.STONE);
-
     protected BlockSounds(BlockSoundGroup delegate) {
         super(delegate);
     }
@@ -27,8 +25,6 @@ public class BlockSounds extends DelegatedConvertable<BlockSoundGroup> {
      * @return 解析后的<code>BlockSoundGroup</code>实例。
      */
     public static BlockSounds of(@Nullable PyDictionary dictionary) {
-        if (dictionary == null) return DEFAULT;
-
         TypedDictionary dict = new TypedDictionary(dictionary);
 
         float volume = dict.getOrDefault("volume", Float.class, 1f);

@@ -7,12 +7,12 @@ import top.frankyang.pre.loader.core.Package;
 
 import java.util.Objects;
 
-public class PrivateAPI extends API {
+public class DedicatedApi extends Api {
     private final Package pkg;
     private final BlockRegistry blockRegistry;
     private final ItemRegistry itemRegistry;
 
-    PrivateAPI(@Nullable Package pkg) {
+    DedicatedApi(@Nullable Package pkg) {
         this.pkg = Objects.requireNonNull(pkg);
         String namespace = pkg.getMetaData().getIdentifier();
         blockRegistry = new BlockRegistry(namespace);

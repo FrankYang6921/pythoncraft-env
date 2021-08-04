@@ -25,7 +25,6 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 abstract class AbstractPythonCraft {
-    protected final Logger logger = LogManager.getLogger();
     protected final Version version = Versions.of("0.1.1");
     protected final PythonThreadPool pythonThreadPool = new PythonThreadPool();
     private boolean looseMode = true;
@@ -89,10 +88,6 @@ abstract class AbstractPythonCraft {
             p -> p.execfile(path), new StandaloneProvider(context, path)
         );
         return 1;
-    }
-
-    public Logger getLogger() {
-        return this.logger;
     }
 
     public Version getVersion() {

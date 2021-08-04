@@ -10,7 +10,7 @@ import org.python.core.PyObject;
  */
 public interface Convertable<T> {
     /**
-     * 转型一个对象到指定的类。如果它是指定的类及其子类的实例，直接返回它本身。如果它是Convertable实例，并且可以转型到指定的类及其子类，返回<code>Object.convert()</code>。如果它是一个Python对象，将它转型成一个Java对象（使用，然后再进行后续的转型。
+     * 转型一个对象到指定的类。如果它是指定的类及其子类的实例，直接返回它本身。如果它是Convertable实例，并且可以转型到指定的类及其子类，返回<code>Object.convert()</code>。如果它是一个Python对象，将它转型成一个Java对象使用，然后再进行后续的转型。
      *
      * @param object 要转型的对象。
      * @param clazz  要转型为的类实例。

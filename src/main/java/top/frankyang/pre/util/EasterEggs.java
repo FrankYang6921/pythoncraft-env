@@ -1,9 +1,5 @@
 package top.frankyang.pre.util;
 
-import net.minecraft.client.util.Window;
-import top.frankyang.pre.api.Minecraft;
-import top.frankyang.pre.mixin.ClientWindowAccessor;
-
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
@@ -46,35 +42,13 @@ public final class EasterEggs {
 
             Thread.sleep(4500);
 
-            ClientWindowAccessor windowAccessor = ClientWindowAccessor.class.cast(Minecraft.getClient().getWindow());
-            Window window = Minecraft.getClient().getWindow();
-
-            int vx = 20, vy = 20;
-            int boundX = width - window.getWidth();
-            int boundY = height - window.getHeight();
-            int cx = RANDOM.nextInt(boundX), cy = RANDOM.nextInt(boundY);
-
+            Robot robot = new Robot();
             while (sequencer.isRunning()) {
-                Robot robot = new Robot();
                 robot.mouseMove(
                     RANDOM.nextInt(width),
                     RANDOM.nextInt(height)
                 );
-                if (cx + vx < 0 || cx + vx > boundX) {
-                    vx *= -1;
-                }
-                if (cy + vy < 0 || cy + vy > boundY) {
-                    vy *= -1;
-                }
-                cx += vx;
-                cy += vy;
-                if (window.isFullscreen()) {
-                    window.toggleFullscreen();
-                }
-                //noinspection ConstantConditions
-                windowAccessor.setWindowedX(cx);
-                windowAccessor.setWindowedY(cy);
-                windowAccessor.callUpdateWindowRegion();
+
                 //noinspection BusyWait
                 Thread.sleep(17);
             }

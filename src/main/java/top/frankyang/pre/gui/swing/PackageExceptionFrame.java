@@ -1,4 +1,4 @@
-package top.frankyang.pre.gui;
+package top.frankyang.pre.gui.swing;
 
 import top.frankyang.pre.loader.ExceptionStatus;
 import top.frankyang.pre.util.StackTraces;
@@ -6,15 +6,19 @@ import top.frankyang.pre.util.StackTraces;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public final class PackageExceptionFrame extends CloseWaitingFrame {
+    public static final int PADDING_WIDTH = 16;
+    public static final int PADDING_HEIGHT = 16;
+    private static ImageIcon icon;
     private ExceptionStatus result = ExceptionStatus.CRASH;
 
     private PackageExceptionFrame(String stackTrace, Path src) {
         super();
 
         setSize(800, 600);
-        setIconImage(Constants.getIcon().getImage());
+        setIconImage(getIcon().getImage());
         setTitle("PythonCraft Runtime Environment");
 
         String string = "PythonCraftRE出错了：在加载或运行" +
@@ -43,7 +47,7 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
 
         JPanel buttonWrapper = new JPanel();
         buttonWrapper.setLayout(new FlowLayout() {{
-            setHgap(Constants.PADDING_WIDTH);
+            setHgap(PADDING_WIDTH);
             setVgap(0);
         }});
         buttonWrapper.add(ignore);
@@ -52,16 +56,16 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
 
         Box outer = Box.createHorizontalBox();
         Box box = Box.createVerticalBox();
-        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        box.add(Box.createVerticalStrut(PADDING_HEIGHT));
         box.add(labelWrapper);
-        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        box.add(Box.createVerticalStrut(PADDING_HEIGHT));
         box.add(textWrapper);
-        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
+        box.add(Box.createVerticalStrut(PADDING_HEIGHT));
         box.add(buttonWrapper);
-        box.add(Box.createVerticalStrut(Constants.PADDING_HEIGHT));
-        outer.add(Box.createHorizontalStrut(Constants.PADDING_WIDTH));
+        box.add(Box.createVerticalStrut(PADDING_HEIGHT));
+        outer.add(Box.createHorizontalStrut(PADDING_WIDTH));
         outer.add(box);
-        outer.add(Box.createHorizontalStrut(Constants.PADDING_WIDTH));
+        outer.add(Box.createHorizontalStrut(PADDING_WIDTH));
 
         add(outer);
 
@@ -85,5 +89,13 @@ public final class PackageExceptionFrame extends CloseWaitingFrame {
         PackageExceptionFrame frame = new PackageExceptionFrame(StackTraces.translate(throwable), src);
         frame.waitForClose();
         return frame.result;
+    }
+
+    public static ImageIcon getIcon() {
+        if (icon != null)
+            return icon;
+        return icon = new ImageIcon(
+            Objects.requireNonNull(PackageExceptionFrame.class.getResource("/assets/pre/icon_trans.png"))
+        );
     }
 }

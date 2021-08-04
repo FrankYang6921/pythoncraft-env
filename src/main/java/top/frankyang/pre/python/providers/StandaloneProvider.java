@@ -4,7 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import org.python.core.Py;
-import top.frankyang.pre.api.core.API;
+import top.frankyang.pre.api.core.Api;
 import top.frankyang.pre.python.internal.Python;
 import top.frankyang.pre.python.internal.PythonImpl;
 import top.frankyang.pre.python.internal.PythonProvider;
@@ -30,7 +30,7 @@ public class StandaloneProvider implements PythonProvider {
         python.setErr(out);
         python.setOut(out);
         python.pushPythonPath(path);  // Adds the parent path of the file to the Python path, so that you can do some imports.
-        python.getSystemState().builtins.__setitem__("API", Py.java2py(API.getPublicInstance()));
+        python.getSystemState().builtins.__setitem__("API", Py.java2py(Api.getSharedInstance()));
         return python;
     }
 

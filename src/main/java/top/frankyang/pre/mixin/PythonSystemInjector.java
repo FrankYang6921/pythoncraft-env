@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 @Mixin(value = PrePy.class, remap = false)
 public class PythonSystemInjector {
-    private static final Logger LOGGER = LogManager.getLogger("EarlyJython");
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Shadow
     private static URL tweakWindowsFileURL(URL url) throws MalformedURLException {
@@ -38,6 +38,7 @@ public class PythonSystemInjector {
                 null, "这是您第一次使用PythonCraft Runtime Environment。由于需要解压运行时文件，游戏启动可能较慢，请耐心等待，" +
                     "后续的启动速度会显著提升。", "PythonCraft Runtime Environment", JOptionPane.INFORMATION_MESSAGE
             );
+            LOGGER.info("Extracting the Jython jar from the memory to the hard drive.");
             Files.copy(Paths.get(uri), dst, StandardCopyOption.REPLACE_EXISTING);
         }
         return dst.toUri();
@@ -75,16 +76,16 @@ public class PythonSystemInjector {
         }
 
         if (fileURI == null) {
-            LOGGER.warn("Cannot locate the Jython jar for site packages.");
+            LOGGER.error("Cannot locate the Jython jar for importing site packages.");
             return null;
         }
         try {
-            LOGGER.info("Copying the memory file system to the default file system.");
             if (!fileURI.getScheme().equals("file"))
                 fileURI = toDefaultFileSystem(fileURI);
+            LOGGER.info("Successfully extracted the Jython jar or used the cached one. ");
             return new File(fileURI).toString();
         } catch (IOException e) {
-            LOGGER.error("Failed to copy the memory file system due to exception: ", e);
+            LOGGER.error("Failed to provide the extracted or cached Jython jar due to ", e);
             throw new RuntimeIOException(e);
         }
     }

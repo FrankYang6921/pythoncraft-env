@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.frankyang.pre.main.PythonCraft;
 
 @Mixin(TitleScreen.class)
-public abstract class TitleScreenInjector extends Screen {
+public class TitleScreenInjector extends Screen {
     protected TitleScreenInjector(Text title) {
         super(title);
     }

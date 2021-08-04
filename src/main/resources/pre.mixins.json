@@ -4,8 +4,6 @@
   "package": "top.frankyang.pre.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ClientBrandInjector",
-    "ClientWindowAccessor",
     "PythonSystemInjector",
     "RenderSystemInjector",
     "ResourcePackInjector",

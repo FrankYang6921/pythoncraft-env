@@ -1,4 +1,4 @@
-package top.frankyang.pre.gui;
+package top.frankyang.pre.gui.swing;
 
 import javax.swing.*;
 import java.awt.event.WindowEvent;

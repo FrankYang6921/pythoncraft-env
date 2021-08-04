@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class API {
-    private static final Map<Package, PrivateAPI> APIs = new ConcurrentHashMap<>();
+public abstract class Api {
+    private static final Map<Package, DedicatedApi> Apis = new ConcurrentHashMap<>();
 
     /**
      * 获取某个PythonCraft包独享的API实例。
@@ -17,8 +17,8 @@ public abstract class API {
      * @param pkg 某个PythonCraft包。
      * @return 此PythonCraft包独享的API实例。
      */
-    public static API getPrivateInstance(Package pkg) {
-        return APIs.computeIfAbsent(Objects.requireNonNull(pkg), PrivateAPI::new);
+    public static Api getDedicatedInstance(Package pkg) {
+        return Apis.computeIfAbsent(Objects.requireNonNull(pkg), DedicatedApi::new);
     }
 
     /**
@@ -26,7 +26,7 @@ public abstract class API {
      *
      * @return 共享的API实例。
      */
-    public static API getPublicInstance() {
+    public static Api getSharedInstance() {
         return PublicAPISingleton.INSTANCE;
     }
 
@@ -37,7 +37,7 @@ public abstract class API {
     public abstract Package getPackage();
 
     private static class PublicAPISingleton {
-        private static final API INSTANCE = new PublicAPI();
+        private static final Api INSTANCE = new SharedApi();
     }
 
 }

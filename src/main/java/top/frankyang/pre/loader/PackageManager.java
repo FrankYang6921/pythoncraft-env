@@ -161,7 +161,7 @@ public class PackageManager {
             userClassPaths.addAll(p.getMetaData().getClassPaths());  // Add the class paths
         }
 
-        userResourcePacks.add(new Pack("pre", path));
+        userResourcePacks.add(new Pack("thumbs", path));
         Files.createFile(path.resolve("fabric.mod.json"));
         path.toFile().deleteOnExit();
 
