@@ -2,12 +2,12 @@ package top.frankyang.pre.api.block.color;
 
 import net.minecraft.block.MaterialColor;
 import org.python.core.PySequenceList;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 
 /**
- * 包装类，包装原版类<code>MaterialColor</code>。
+ * 包装类，包装原版类{@link MaterialColor}。
  */
-public class Color extends DelegatedConvertable<MaterialColor> implements ColorLike {
+public class Color extends DelegatedCastable<MaterialColor> implements ColorLike {
     protected Color(MaterialColor delegate) {
         super(delegate);
     }

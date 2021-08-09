@@ -8,13 +8,13 @@ import org.jetbrains.annotations.Nullable;
 import org.python.core.PyDictionary;
 import top.frankyang.pre.api.block.color.BasicColor;
 import top.frankyang.pre.api.block.color.ColorLike;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.util.TypedDictionary;
 
 /**
- * 包装类，包装原版类<code>Material</code>。
+ * 包装类，包装原版类{@link Material}。
  */
-public class BlockMaterial extends DelegatedConvertable<Material> {
+public class BlockMaterial extends DelegatedCastable<Material> {
     public static final BlockMaterial DEFAULT = new BlockMaterial(Material.STONE);
 
     protected BlockMaterial(Material delegate) {
@@ -35,7 +35,7 @@ public class BlockMaterial extends DelegatedConvertable<Material> {
         FabricMaterialBuilder fabricMaterialBuilder = new FabricMaterialBuilder(
             dict.getOrCompute("color", ColorLike.class, () ->
                 BasicColor.valueOf(dict.getRequired("color", String.class))
-            ).convert()
+            ).cast()
         );
         dict.ifTrue("burnable", fabricMaterialBuilder::burnable);
         dict.ifTrue("lightPassesThrough", fabricMaterialBuilder::lightPassesThrough);

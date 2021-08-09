@@ -34,7 +34,7 @@ public enum VanillaGroup implements GroupLike {
     }
 
     @Override
-    public ItemGroup convert() {
+    public ItemGroup cast() {
         return delegate;
     }
 }

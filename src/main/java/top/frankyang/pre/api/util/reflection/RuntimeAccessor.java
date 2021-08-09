@@ -1,7 +1,7 @@
 package top.frankyang.pre.api.util.reflection;
 
 import org.jetbrains.annotations.Nullable;
-import top.frankyang.pre.api.misc.Convertable;
+import top.frankyang.pre.api.misc.Castable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,7 +14,7 @@ import java.util.Objects;
  * @param <T> 要访问的类。
  */
 @FunctionalInterface
-public interface RuntimeAccessor<T> extends Convertable<T> {
+public interface RuntimeAccessor<T> extends Castable<T> {
     /**
      * @param clazz 要访问的类对象。
      * @param <T>   要访问的类。
@@ -58,7 +58,7 @@ public interface RuntimeAccessor<T> extends Convertable<T> {
         return null;
     }
 
-    default T convert() {
+    default T cast() {
         return Objects.requireNonNull(
             getTarget(), "Cannot convert to a target object from a static-only runtime accessor!");
     }
@@ -164,6 +164,30 @@ public interface RuntimeAccessor<T> extends Convertable<T> {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 调用一个方法。
+     *
+     * @param name 方法名。
+     * @param type 方法形参类型。
+     * @param arg  方法实参。
+     * @param <U>  语法糖性质的类型参数。允许隐式转型到任意一个类型。
+     * @return 方法的返回值。
+     */
+    default <U> U invoke(String name, Class<?> type, Object arg) {
+        return invoke(name, new Class[]{type}, new Object[]{arg});
+    }
+
+    /**
+     * 调用一个方法。
+     *
+     * @param name 方法名。
+     * @param <U>  语法糖性质的类型参数。允许隐式转型到任意一个类型。
+     * @return 方法的返回值。
+     */
+    default <U> U invoke(String name) {
+        return invoke(name, new Class[0], new Object[0]);
     }
 
     /**

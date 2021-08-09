@@ -30,7 +30,7 @@ public enum BasicColor implements ColorLike {
     }
 
     @Override
-    public MaterialColor convert() {
+    public MaterialColor cast() {
         return delegate;
     }
 }

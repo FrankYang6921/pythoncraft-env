@@ -7,13 +7,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 import org.python.core.PyDictionary;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.util.TypedDictionary;
 
 /**
- * 包装类，包装原版类<code>BlockSoundGroup</code>。
+ * 包装类，包装原版类{@link BlockSoundGroup}。
  */
-public class BlockSounds extends DelegatedConvertable<BlockSoundGroup> {
+public class BlockSounds extends DelegatedCastable<BlockSoundGroup> {
     protected BlockSounds(BlockSoundGroup delegate) {
         super(delegate);
     }
@@ -22,7 +22,7 @@ public class BlockSounds extends DelegatedConvertable<BlockSoundGroup> {
      * 将一个Python字典解析为方块音效。
      *
      * @param dictionary 用于解析的Python字典。
-     * @return 解析后的<code>BlockSoundGroup</code>实例。
+     * @return 解析后的<code>BlockSounds</code>实例。
      */
     public static BlockSounds of(@Nullable PyDictionary dictionary) {
         TypedDictionary dict = new TypedDictionary(dictionary);

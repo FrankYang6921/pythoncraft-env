@@ -2,13 +2,13 @@ package top.frankyang.pre.api.item.food;
 
 import net.minecraft.item.FoodComponent;
 import org.python.core.PyDictionary;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.util.TypedDictionary;
 
 /**
- * 包装类，包装原版类<code>FoodComponent</code>。
+ * 包装类，包装原版类{@link FoodComponent}。
  */
-public class Food extends DelegatedConvertable<FoodComponent> {
+public class Food extends DelegatedCastable<FoodComponent> {
     protected Food(FoodComponent delegate) {
         super(delegate);
     }

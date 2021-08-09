@@ -54,7 +54,7 @@ public enum VanillaFood implements FoodLike {
     }
 
     @Override
-    public FoodComponent convert() {
+    public FoodComponent cast() {
         return delegate;
     }
 }

@@ -7,15 +7,15 @@ import net.minecraft.util.Identifier;
 import org.python.core.PyDictionary;
 import org.python.core.PySequenceList;
 import top.frankyang.pre.api.item.ItemRegistry;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.util.TypedDictionary;
 
 import java.util.stream.Stream;
 
 /**
- * 包装类，包装原版类<code>ItemGroup</code>。
+ * 包装类，包装原版类{@link ItemGroup}。
  */
-public class Group extends DelegatedConvertable<ItemGroup> implements GroupLike {
+public class Group extends DelegatedCastable<ItemGroup> implements GroupLike {
     protected Group(ItemGroup delegate) {
         super(delegate);
     }

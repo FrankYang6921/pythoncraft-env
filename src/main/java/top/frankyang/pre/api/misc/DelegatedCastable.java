@@ -5,15 +5,15 @@ package top.frankyang.pre.api.misc;
  *
  * @param <T> 可转型的类。
  */
-public abstract class DelegatedConvertable<T> implements Convertable<T> {
+public abstract class DelegatedCastable<T> implements Castable<T> {
     protected T delegate;
 
-    protected DelegatedConvertable(T delegate) {
+    protected DelegatedCastable(T delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    public T convert() {
+    public T cast() {
         return delegate;
     }
 }

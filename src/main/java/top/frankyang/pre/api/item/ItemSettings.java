@@ -14,10 +14,13 @@ import top.frankyang.pre.api.item.food.VanillaFood;
 import top.frankyang.pre.api.item.group.Group;
 import top.frankyang.pre.api.item.group.GroupLike;
 import top.frankyang.pre.api.item.group.VanillaGroup;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.util.TypedDictionary;
 
-public class ItemSettings extends DelegatedConvertable<FabricItemSettings> {
+/**
+ * 包装类，包装原版类{@link FabricItemSettings}。
+ */
+public class ItemSettings extends DelegatedCastable<FabricItemSettings> {
     protected ItemSettings(FabricItemSettings delegate) {
         super(delegate);
     }
@@ -35,13 +38,13 @@ public class ItemSettings extends DelegatedConvertable<FabricItemSettings> {
 
         dict.ifTrue("fireproof", fabricItemSettings::fireproof);
         dict.ifPresent("group", GroupLike.class, g -> {
-            fabricItemSettings.group(g.convert());
+            fabricItemSettings.group(g.cast());
         });
         dict.ifPresent("group", PyDictionary.class, d -> {
-            fabricItemSettings.group(Group.of(d).convert());
+            fabricItemSettings.group(Group.of(d).cast());
         });
         dict.ifPresent("group", String.class, s -> {
-            fabricItemSettings.group(VanillaGroup.valueOf(s).convert());
+            fabricItemSettings.group(VanillaGroup.valueOf(s).cast());
         });
         dict.ifPresent("rarity", String.class, s -> {
             fabricItemSettings.rarity(Rarity.valueOf(s));
@@ -50,13 +53,13 @@ public class ItemSettings extends DelegatedConvertable<FabricItemSettings> {
             fabricItemSettings.equipmentSlot(i -> EquipmentSlot.valueOf(s));
         });
         dict.ifPresent("food", FoodLike.class, f -> {
-            fabricItemSettings.food(f.convert());
+            fabricItemSettings.food(f.cast());
         });
         dict.ifPresent("food", PyDictionary.class, d -> {
-            fabricItemSettings.food(Food.of(d).convert());
+            fabricItemSettings.food(Food.of(d).cast());
         });
         dict.ifPresent("food", String.class, s -> {
-            fabricItemSettings.food(VanillaFood.valueOf(s).convert());
+            fabricItemSettings.food(VanillaFood.valueOf(s).cast());
         });
         dict.ifPresent("maxCount", Number.class, n -> {
             fabricItemSettings.maxCount(n.intValue());

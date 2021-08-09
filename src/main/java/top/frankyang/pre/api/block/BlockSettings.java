@@ -1,19 +1,20 @@
 package top.frankyang.pre.api.block;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.block.AbstractBlock;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.core.PyFunction;
 import org.python.core.PySequenceList;
-import top.frankyang.pre.api.misc.DelegatedConvertable;
+import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.util.TypedDictionary;
 
 import java.util.function.ToIntFunction;
 
 /**
- * 包装类，包装原版类<code>AbstractBlock.Settings</code>。
+ * 包装类，包装原版类{@link AbstractBlock.Settings}。
  */
-public class BlockSettings extends DelegatedConvertable<FabricBlockSettings> {
+public class BlockSettings extends DelegatedCastable<FabricBlockSettings> {
     protected BlockSettings(FabricBlockSettings delegate) {
         super(delegate);
     }
@@ -31,14 +32,14 @@ public class BlockSettings extends DelegatedConvertable<FabricBlockSettings> {
         FabricBlockSettings fabricBlockSettings = FabricBlockSettings.of(
             dict.getOrCompute("material", BlockMaterial.class, () ->
                 BlockMaterial.of(dict.get("material", PyDictionary.class))
-            ).convert()
+            ).cast()
         );
 
         dict.ifPresent("sounds", BlockSounds.class, p -> {
-            fabricBlockSettings.sounds(p.convert());
+            fabricBlockSettings.sounds(p.cast());
         });
         dict.ifPresent("sounds", PyDictionary.class, p -> {
-            fabricBlockSettings.sounds(BlockSounds.of(p).convert());
+            fabricBlockSettings.sounds(BlockSounds.of(p).cast());
         });
         dict.ifPresent("lightLevel", Integer.class, fabricBlockSettings::lightLevel);
         dict.ifPresent("lightLevel", PyFunction.class, f -> {

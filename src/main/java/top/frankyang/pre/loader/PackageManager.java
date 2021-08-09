@@ -9,7 +9,7 @@ import top.frankyang.pre.loader.exceptions.PkgLoadException;
 import top.frankyang.pre.loader.exceptions.RuntimeIOException;
 import top.frankyang.pre.main.PythonCraft;
 import top.frankyang.pre.misc.LambdaContainer;
-import top.frankyang.pre.util.ClassLoaders;
+import top.frankyang.pre.util.URLs;
 
 import java.io.IOException;
 import java.net.URL;
@@ -127,8 +127,6 @@ public class PackageManager {
             });
         }
 
-        ClassLoaders.injectToKnot(userClassLoader, userClassURLs.get());  // Only runs when successful
-
         managerStatus = ManagerStatus.LOADED;
     }
 
@@ -165,9 +163,9 @@ public class PackageManager {
         Files.createFile(path.resolve("fabric.mod.json"));
         path.toFile().deleteOnExit();
 
-        URL[] userClassURLs = ClassLoaders.pathsToURLs(userClassPaths);
+        URL[] userClassURLs = URLs.pathsToURLs(userClassPaths);
         userClassLoader = new URLClassLoader(
-            userClassURLs, ClassLoader.getSystemClassLoader());
+            userClassURLs, PackageManager.class.getClassLoader());
         return userClassURLs;
     }
 

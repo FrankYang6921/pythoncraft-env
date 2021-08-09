@@ -3,21 +3,21 @@ package top.frankyang.pre.api.item.food;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.FoodComponent;
-import top.frankyang.pre.api.misc.Convertable;
+import top.frankyang.pre.api.misc.Castable;
 
 import java.util.List;
 
 /**
- * 包装类接口，包装原版类<code>FoodComponent</code>。
+ * 包装类接口，包装原版类{@link FoodComponent}。
  */
-public interface FoodLike extends Convertable<FoodComponent> {
+public interface FoodLike extends Castable<FoodComponent> {
     /**
      * 获取该食物可以恢复的饱食度，以半格为单位。
      *
      * @return 该食物可以恢复的饱食度。
      */
     default int getHunger() {
-        return convert().getHunger();
+        return cast().getHunger();
     }
 
     /**
@@ -26,7 +26,7 @@ public interface FoodLike extends Convertable<FoodComponent> {
      * @return 该食物的饱和指数。
      */
     default float getSaturationModifier() {
-        return convert().getSaturationModifier();
+        return cast().getSaturationModifier();
     }
 
     /**
@@ -35,7 +35,7 @@ public interface FoodLike extends Convertable<FoodComponent> {
      * @return 是否是肉食。
      */
     default boolean isMeat() {
-        return convert().isMeat();
+        return cast().isMeat();
     }
 
     /**
@@ -44,7 +44,7 @@ public interface FoodLike extends Convertable<FoodComponent> {
      * @return 是否永远可食用。
      */
     default boolean isAlwaysEdible() {
-        return convert().isAlwaysEdible();
+        return cast().isAlwaysEdible();
     }
 
     /**
@@ -53,7 +53,7 @@ public interface FoodLike extends Convertable<FoodComponent> {
      * @return 是否是零食。
      */
     default boolean isSnack() {
-        return convert().isSnack();
+        return cast().isSnack();
     }
 
     /**
@@ -62,6 +62,6 @@ public interface FoodLike extends Convertable<FoodComponent> {
      * @return &lt;尚未完工&gt;
      */
     default List<Pair<StatusEffectInstance, Float>> getStatusEffects() {  // TODO 加入自定义的状态效果以兼容此方法
-        return convert().getStatusEffects();
+        return cast().getStatusEffects();
     }
 }

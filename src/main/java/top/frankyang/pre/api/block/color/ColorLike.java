@@ -1,19 +1,19 @@
 package top.frankyang.pre.api.block.color;
 
 import net.minecraft.block.MaterialColor;
-import top.frankyang.pre.api.misc.Convertable;
+import top.frankyang.pre.api.misc.Castable;
 
 /**
- * 包装类接口，包装原版类<code>MaterialColor</code>。
+ * 包装类接口，包装原版类{@link MaterialColor}。
  */
-public interface ColorLike extends Convertable<MaterialColor> {
+public interface ColorLike extends Castable<MaterialColor> {
     /**
      * 获取这个颜色在Minecraft中的原生ID。应当是0~63的整数。
      *
      * @return 原生ID。
      */
     default int getRawId() {
-        return convert().id;
+        return cast().id;
     }
 
     /**
@@ -22,6 +22,6 @@ public interface ColorLike extends Convertable<MaterialColor> {
      * @return 粗略颜色。
      */
     default int getColor() {
-        return convert().color;
+        return cast().color;
     }
 }
