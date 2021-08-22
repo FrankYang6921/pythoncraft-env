@@ -4,7 +4,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.python.core.PyDictionary;
 import top.frankyang.pre.api.AbstractRegistry;
 import top.frankyang.pre.api.misc.Castable;
 
@@ -35,7 +34,7 @@ public final class ItemRegistry extends AbstractRegistry {
      * @param id   所注册物品的命名空间ID。
      * @param item 所要注册的物品实例。
      */
-    public synchronized void registerItem(String id, Object item) {
+    public synchronized void registerItem(String id, Object item) {  // TODO 不用Object
         Registry.register(Registry.ITEM, getIdentifier(id), Castable.infer(item, Item.class));
     }
 
@@ -45,8 +44,8 @@ public final class ItemRegistry extends AbstractRegistry {
      * @param id           所注册物品的命名空间ID。
      * @param itemSettings 所要注册的物品设置（Python字典，会自动解析设置并创建物品实例）。
      */
-    public synchronized void registerItem(String id, PyDictionary itemSettings) {
-        Registry.register(Registry.ITEM, getIdentifier(id), new Item(ItemSettings.parse(itemSettings).cast()));
+    public synchronized void registerItem(String id, ItemSettings itemSettings) {
+        Registry.register(Registry.ITEM, getIdentifier(id), new Item(itemSettings.cast()));
     }
 
     /**

@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.util.reflection;
+package top.frankyang.pre.api.reflection;
 
 import com.mojang.datafixers.util.Pair;
 import net.sf.cglib.proxy.Enhancer;
@@ -6,12 +6,14 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.jetbrains.annotations.NotNull;
 import top.frankyang.pre.api.misc.Castable;
-import top.frankyang.pre.loader.exceptions.ImpossibleException;
+import top.frankyang.pre.api.reflection.mapping.SymbolResolver;
+import top.frankyang.pre.api.util.ArrayUtils;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAccessor<T>, MethodInterceptor, Castable<T> {
@@ -19,20 +21,19 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
     /**
      * 方法的缓存。一旦一个方法被证实可以被委托给该类，它就会被加入这个缓存。
      */
-    protected final Map<MethodWrapper, Method> overrides = new HashMap<>();
+    protected final Map<MethodWrapper, Method> overrides = new ConcurrentHashMap<>();
     /**
      * 方法返回值的缓存。一旦一个方法被标注为常量方法，它的返回值就会被加入这个缓存。
      */
-    protected final Map<MethodWrapper, Object> constants = new HashMap<>();
+    protected final Map<MethodWrapper, Object> constants = new ConcurrentHashMap<>();
     /**
      * 方法的缓存。一旦一个方法被证实不可以被委托给该类，它就会被加入这个缓存。
      */
-    protected final HashSet<MethodWrapper> noOverrides = new HashSet<>();
+    protected final Set<MethodWrapper> noOverrides = Collections.newSetFromMap(new ConcurrentHashMap<>());
     /**
      * 当前的类。因为此类是一个不可能被实例化的抽象类，因此它总是此类的子类。
      */
-    protected final Class<? extends DynamicOverrider<T>> currentClass =
-        (Class<? extends DynamicOverrider<T>>) this.getClass();
+    protected final Class<? extends DynamicOverrider<T>> currentClass = (Class<? extends DynamicOverrider<T>>) this.getClass();
     /**
      * 要重写方法的类。这个类对象应当是T或其子类以供重写方法。
      */
@@ -42,16 +43,35 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
      */
     private T target;
 
-    public DynamicOverrider(Class<? extends T> targetClass) {
+    /**
+     * 创建一个动态重写器。在使用目标对象之前，应当先调用{@link DynamicOverrider#superConstructor(Class[], Object...)}。
+     *
+     * @param targetClass 目标类。
+     */
+    public DynamicOverrider(Class<? extends T> targetClass, Class<?>... interfaces) {
         super();
+
+        for (Class<?> $interface : interfaces) {
+            if (!$interface.isInterface()) {
+                throw new IllegalArgumentException("Class passed in as an interface (" + $interface.getName() + ") is not an interface.");
+            }
+        }
+
         this.targetClass = targetClass;
         setSuperclass(this.targetClass);
+        setInterfaces(interfaces);
         setCallback(this);
 
         Set<String> excludedNames = Arrays.stream(DynamicOverrider.class.getMethods())
             .map(Method::getName)
             .collect(Collectors.toSet());
-        Set<String> candidateNames = Arrays.stream(targetClass.getMethods())
+        Set<Method> methods = Stream.concat(
+            Arrays.stream(targetClass.getMethods()),
+            Arrays.stream(interfaces)
+                .map(Class::getMethods)
+                .flatMap(Arrays::stream)
+        ).collect(Collectors.toSet());
+        Set<String> candidateNames = methods.stream()
             .map(RESOLVER::mappingNameOf)
             .collect(Collectors.toSet());
 
@@ -59,21 +79,21 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
         Arrays.stream(currentClass.getMethods())
             .filter(DynamicOverrider::hasAnnotation)
             .map(m -> new Pair<>(m, getAnnotation(m)))
-            .filter(p -> !excludedNames.contains(nameOf(p)))
-            .filter(p -> candidateNames.contains(nameOf(p)))
+            .filter(p -> !excludedNames.contains(nameOrAliasOf(p)))
+            .filter(p -> candidateNames.contains(nameOrAliasOf(p)))
             .forEach(candidates::add);
 
-        for (Method superMethod : targetClass.getMethods()) {
+        for (Method superMethod : methods) {
             String name = RESOLVER.mappingNameOf(superMethod);
             Pair<Method, DynamicOverride> override = candidates.stream()
-                .filter(p -> nameOf(p).equals(name) && isCompatible(superMethod, p.getFirst()))
+                .filter(p -> nameOrAliasOf(p).equals(name) && isCompatible(superMethod, p.getFirst()))
                 .findFirst()
                 .orElse(null);
             if (override != null) {
                 Method m = override.getFirst();
                 m.setAccessible(true);
                 if (override.getSecond().constant()) {
-                    Object o = invokeAsAllNull(m);
+                    Object o = invoke(m);
                     constants.put(new MethodWrapper(superMethod), o);
                 } else {
                     overrides.put(new MethodWrapper(superMethod), m);
@@ -83,10 +103,11 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
                 noOverrides.add(new MethodWrapper(superMethod));
             }
         }
+        candidates.removeIf(m -> !m.getSecond().required());
         if (!candidates.isEmpty()) {
             StringBuilder builder = new StringBuilder();
             candidates.forEach(
-                p -> builder.append("DOES NOT MATCH: ").append(p.getFirst()).append("\n")
+                p -> builder.append("\tDoes not match: ").append(p.getFirst()).append("\n")
             );
             throw new RuntimeException("Not all methods matched a super method: \n" + builder);
         }
@@ -100,28 +121,14 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
         return method.getAnnotationsByType(DynamicOverride.class)[0];
     }
 
-    private static String nameOf(Pair<Method, DynamicOverride> p) {
+    private static String nameOrAliasOf(Pair<Method, DynamicOverride> p) {
         if (p.getSecond().value().isEmpty())
             return p.getFirst().getName();
         return p.getSecond().value();
     }
 
-    private static Class<?>[] ofClasses(Object[] objects) {
-        Class<?>[] classes = new Class[objects.length];
-        for (int i = 0; i < classes.length; i++)
-            classes[i] = objects[i].getClass();
-        return classes;
-    }
-
-    private static <U> U[] mergeArrays(Class<U> clazz, U[] array, U... more) {
-        U[] newArray = (U[]) Array.newInstance(clazz, array.length + more.length);
-        System.arraycopy(array, 0, newArray, 0, array.length);
-        System.arraycopy(more, 0, newArray, array.length, more.length);
-        return newArray;
-    }
-
     private static boolean isCompatible(Method source, Method override) {
-        Class<?>[] srcTypes = mergeArrays(
+        Class<?>[] srcTypes = ArrayUtils.mergeArrays(
             Class.class, source.getParameterTypes(), MethodContainer.class
         );
         Class<?>[] dstTypes = override.getParameterTypes();
@@ -134,17 +141,11 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
         return source.getReturnType().isAssignableFrom(override.getReturnType());
     }
 
-    public void createTarget(Class<?>[] classes, Object... args) {
-        if (target != null)
-            throw new IllegalStateException("Target already created.");
-        target = (T) create(classes, args);
-    }
-
-    private Object invokeAsAllNull(Method method) {
+    private Object invoke(Method method) {
         try {
             return method.invoke(this, new Object[method.getParameterTypes().length]);
         } catch (ReflectiveOperationException e) {
-            throw new ImpossibleException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -179,23 +180,34 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
         };
         if (overrides.containsKey(finder)) {
             Method override = overrides.get(finder);
-            return override.invoke(
-                this, mergeArrays(Object.class, args, container)
-            );
+            return override.invoke(this, ArrayUtils.mergeArrays(Object.class, args, container));
         }
         return proxy.invokeSuper(obj, args);
     }
 
     @Override
-    public final Class<? extends T> getTargetClass() {
+    public Class<? extends T> getClazz() {
         return targetClass;
     }
 
     @Override
-    public final @NotNull T getTarget() {
+    public @NotNull T getTarget() {
         if (target == null)
-            throw new NullPointerException("Target not created yet.");
+            throw new NullPointerException("Target not constructed yet.");
         return target;
+    }
+
+    /**
+     * 调用目标类的构造方法，返回一个实例。
+     *
+     * @param classes 目标类构造器的参数类型。
+     * @param args    目标类构造器的参数。
+     * @return 构造的实例。
+     */
+    public T superConstructor(Class<?>[] classes, Object... args) {
+        if (target != null)
+            throw new NullPointerException("Target already constructed.");
+        return target = (T) create(classes, args);
     }
 
     private static class MethodWrapper {
@@ -218,7 +230,8 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
 
         @Override
         public int hashCode() {
-            return method.getName().hashCode() ^ Arrays.hashCode(method.getParameterTypes());
+            return method.getName().hashCode() ^
+                Arrays.hashCode(method.getParameterTypes());
         }
     }
 }

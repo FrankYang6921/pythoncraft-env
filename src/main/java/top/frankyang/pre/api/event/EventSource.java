@@ -3,6 +3,7 @@ package top.frankyang.pre.api.event;
 import top.frankyang.pre.main.PythonCraft;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,23 +41,28 @@ public class EventSource<T extends Event> {
      * 触发一个事件源。
      *
      * @param event 用于触发事件源的事件。
-     * @return 该事件的默认操作是否被抑制。
+     * @return 成功触发的侦听器的数量。
      */
-    public boolean trigger(T event) {
-        event.beforeListeners();
+    public int trigger(T event) {
+        event.beforeListeners(this);
+        int c = 0;
         for (EventListener<? super T> eventListener : eventListeners) {
             try {
-                if (!eventListener.trigger(event)) break;
+                eventListener.trigger(event);
+                c++;
             } catch (Throwable throwable) {
                 PythonCraft.getInstance().getLogger().error(
                     "Failed to run event listener " + eventListener + " for event " +
                         event.getType() + " in event source " + this + ": ", throwable
                 );
-                break;
             }
         }
-        event.afterListeners();
-        return event.defaultActionSuppressed();
+        event.afterListeners(this);
+        return c;
+    }
+
+    public List<EventListener<? super T>> getEventListeners() {
+        return Collections.unmodifiableList(eventListeners);
     }
 
     @Override

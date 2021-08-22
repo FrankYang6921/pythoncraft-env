@@ -12,32 +12,14 @@ public interface Event {
     EventType getType();
 
     /**
-     * 抑制一个事件的默认动作。
-     *
-     * @return 该操作是否成功完成。
+     * 内部使用的方法，供事件源回调。
      */
-    default boolean suppressDefaultAction() {
-        return false;
-    }
-
-    /**
-     * 获取该事件的默认动作是否被抑制。
-     *
-     * @return 默认动作是否被抑制。
-     */
-    default boolean defaultActionSuppressed() {
-        return true;
+    default void beforeListeners(EventSource<?> source) {
     }
 
     /**
      * 内部使用的方法，供事件源回调。
      */
-    default void beforeListeners() {
-    }
-
-    /**
-     * 内部使用的方法，供事件源回调。
-     */
-    default void afterListeners() {
+    default void afterListeners(EventSource<?> source) {
     }
 }

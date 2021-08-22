@@ -1,7 +1,6 @@
 package top.frankyang.pre.api.block.color;
 
 import net.minecraft.block.MaterialColor;
-import org.python.core.PySequenceList;
 import top.frankyang.pre.api.misc.DelegatedCastable;
 
 /**
@@ -61,23 +60,8 @@ public class Color extends DelegatedCastable<MaterialColor> implements ColorLike
         } else if (string.length() != 6) {
             throw new IllegalArgumentException("Invalid hex color string: " + string);
         }
-        int rawColor = Integer.parseInt(string, 16);
-        int r = (rawColor & 0xff0000) >> 16;
-        int g = (rawColor & 0x00ff00) >> 8;
-        int b = rawColor & 0x0000ff;
 
-        return of(r, g, b);
-    }
-
-    /**
-     * 通过一个值范围为0~255的三元组构造颜色对象。
-     *
-     * @param list 包含红色、绿色、蓝色值的三元组。
-     * @return 所构造的颜色对象。
-     * @throws IllegalArgumentException 如果任一颜色值超出了[0, 255]的范围。
-     */
-    public static Color of(PySequenceList list) {
-        return of((Integer) list.get(0), (Integer) list.get(1), ((Integer) list.get(2)));
+        return of(Integer.parseInt(string, 16));
     }
 
     /**
@@ -94,5 +78,13 @@ public class Color extends DelegatedCastable<MaterialColor> implements ColorLike
             throw new IllegalArgumentException("Invalid color: must be in range [0, 255].");
         }
         return new Color(findNearest(r, g, b));
+    }
+
+    public static Color of(int rawColor) {
+        int r = (rawColor & 0xff0000) >> 16;
+        int g = (rawColor & 0x00ff00) >> 8;
+        int b = rawColor & 0x0000ff;
+
+        return of(r, g, b);
     }
 }

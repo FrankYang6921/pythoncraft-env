@@ -59,7 +59,7 @@ public final class StackTraces {
         String tmpdir = System.getProperty("java.io.tmpdir");
         stackTrace = stackTrace.replaceAll(
             tmpdir.replace("\\", "\\\\") +
-                "[\\\\/]?[a-f0-9]{32}-[0-9]+", "<包的根目录>"
+                "[\\\\/]?[a-f0-9]+-[0-9]+", "<包的根目录>"
         );
         stackTrace = stackTrace.replace(
             "Traceback (most recent call last):", "\n\n[Python异常栈（通常是最后调用的）]"

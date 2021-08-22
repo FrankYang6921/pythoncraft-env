@@ -8,6 +8,9 @@ package top.frankyang.pre.api.misc;
 public abstract class DelegatedCastable<T> implements Castable<T> {
     protected T delegate;
 
+    protected DelegatedCastable() {
+    }
+
     protected DelegatedCastable(T delegate) {
         this.delegate = delegate;
     }

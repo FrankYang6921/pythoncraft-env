@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.block.state;
+package top.frankyang.pre.api.block.state.property;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-class EnumProperty<T extends Enum<T>> extends Property<T> {
+public class EnumProperty<T extends Enum<T>> extends Property<T> {
     private final ImmutableSet<T> values;
     private final Map<String, T> byName = new HashMap<>();
 
@@ -45,7 +45,7 @@ class EnumProperty<T extends Enum<T>> extends Property<T> {
         return new EnumProperty<>(name, type, values);
     }
 
-    private static String minecraftNameOf(Enum<?> e) {
+    static String minecraftNameOf(Enum<?> e) {
         String s = e.toString();
         Pattern p = Pattern.compile("([A-Z])([a-z])");
         Matcher m = p.matcher(s);

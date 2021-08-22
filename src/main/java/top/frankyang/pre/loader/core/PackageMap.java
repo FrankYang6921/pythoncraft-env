@@ -4,15 +4,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class PackageMap implements Iterable<Package> {
-    private final HashMap<String, Package> filenameToPkg = new HashMap<>();
-    private final HashMap<String, Package> identifierToPkg = new HashMap<>();
+    private final Map<String, Package> filenameToPkg = new HashMap<>();
+    private final Map<String, Package> identifierToPkg = new HashMap<>();
 
     public void put(Package pkg) {
         String filename = pkg.getPackageSrc().getFileName().toString();

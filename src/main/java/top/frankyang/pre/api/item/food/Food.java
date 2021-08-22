@@ -1,38 +1,56 @@
 package top.frankyang.pre.api.item.food;
 
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.FoodComponent;
-import org.python.core.PyDictionary;
 import top.frankyang.pre.api.misc.DelegatedCastable;
-import top.frankyang.pre.api.util.TypedDictionary;
 
 /**
  * 包装类，包装原版类{@link FoodComponent}。
  */
-public class Food extends DelegatedCastable<FoodComponent> {
+public class Food extends DelegatedCastable<FoodComponent> implements FoodLike {
     protected Food(FoodComponent delegate) {
         super(delegate);
     }
 
-    /**
-     * 将一个Python字典解析为食物属性。
-     *
-     * @param dictionary 用于解析的Python字典。
-     * @return 解析后的<code>Food</code>实例。
-     */
-    @SuppressWarnings("CodeBlock2Expr")
-    public static Food of(PyDictionary dictionary) {
-        TypedDictionary dict = new TypedDictionary(dictionary);
+    public static Builder of() {
+        return new Builder();
+    }
 
-        FoodComponent.Builder foodComponentBuilder = new FoodComponent.Builder();
-        dict.ifPresent("hunger", Integer.class, foodComponentBuilder::hunger);
-        dict.ifPresent("saturationModifier", Number.class, n -> {
-            foodComponentBuilder.saturationModifier(n.floatValue());
-        });
-        dict.ifTrue("meat", foodComponentBuilder::meat);
-        dict.ifTrue("alwaysEdible", foodComponentBuilder::alwaysEdible);
-        dict.ifTrue("snack", foodComponentBuilder::snack);
-        // TODO 加入自定义的状态效果以兼容statusEffect()方法
+    public static class Builder {
+        private final FoodComponent.Builder foodComponentBuilder = new FoodComponent.Builder();
 
-        return new Food(foodComponentBuilder.build());
+        public Food.Builder hunger(int hunger) {
+            foodComponentBuilder.hunger(hunger);
+            return this;
+        }
+
+        public Food.Builder saturationModifier(float saturationModifier) {
+            foodComponentBuilder.saturationModifier(saturationModifier);
+            return this;
+        }
+
+        public Food.Builder meat() {
+            foodComponentBuilder.meat();
+            return this;
+        }
+
+        public Food.Builder alwaysEdible() {
+            foodComponentBuilder.alwaysEdible();
+            return this;
+        }
+
+        public Food.Builder snack() {
+            foodComponentBuilder.snack();
+            return this;
+        }
+
+        public Food.Builder statusEffect(StatusEffectInstance effect, float chance) {  // TODO 包装状态效果
+            foodComponentBuilder.statusEffect(effect, chance);
+            return this;
+        }
+
+        public Food build() {
+            return new Food(foodComponentBuilder.build());
+        }
     }
 }

@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.util.reflection;
+package top.frankyang.pre.api.reflection.mapping;
 
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.mapping.tree.ClassDef;

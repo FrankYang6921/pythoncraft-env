@@ -4,13 +4,11 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import org.python.core.PyDictionary;
-import org.python.core.PySequenceList;
-import top.frankyang.pre.api.item.ItemRegistry;
 import top.frankyang.pre.api.misc.DelegatedCastable;
-import top.frankyang.pre.api.util.TypedDictionary;
 
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 包装类，包装原版类{@link ItemGroup}。
@@ -20,31 +18,34 @@ public class Group extends DelegatedCastable<ItemGroup> implements GroupLike {
         super(delegate);
     }
 
-    /**
-     * 创建一个物品组。
-     *
-     * @param dictionary 所要创建的物品组的属性。
-     */
-    @SuppressWarnings("CodeBlock2Expr")
-    public static Group of(PyDictionary dictionary) {
-        TypedDictionary dict = new TypedDictionary(dictionary);
+    public static Builder of(String id) {
+        return new Builder(FabricItemGroupBuilder.create(new Identifier(id)));
+    }
 
-        FabricItemGroupBuilder fabricItemGroupBuilder =
-            FabricItemGroupBuilder.create(new Identifier(dict.getRequired("id", String.class)));
-        dict.ifPresent("icon", String.class, s -> {
-            fabricItemGroupBuilder.icon(() -> new ItemStack(ItemRegistry.lookup(new Identifier(s))));
-        });
-        dict.ifPresent("items", PySequenceList.class, p -> {
-            fabricItemGroupBuilder.appendItems(s -> {
-                ((Stream<?>) p.stream())
-                    .map(Object::toString)
-                    .map(Identifier::new)
-                    .map(ItemRegistry::lookup)
-                    .map(ItemStack::new)
-                    .forEach(s::add);
-            });
-        });
+    public static class Builder {
+        private final FabricItemGroupBuilder fabricItemGroupBuilder;
 
-        return new Group(fabricItemGroupBuilder.build());
+        public Builder(FabricItemGroupBuilder fabricItemGroupBuilder) {
+            this.fabricItemGroupBuilder = fabricItemGroupBuilder;
+        }
+
+        public Builder icon(Supplier<ItemStack> stackSupplier) {
+            fabricItemGroupBuilder.icon(stackSupplier);
+            return this;
+        }
+
+        public Builder stacksForDisplay(Consumer<List<ItemStack>> appender) {
+            fabricItemGroupBuilder.stacksForDisplay(appender);
+            return this;
+        }
+
+        public Builder appendItems(Consumer<List<ItemStack>> stacksForDisplay) {
+            fabricItemGroupBuilder.appendItems(stacksForDisplay);
+            return this;
+        }
+
+        public Group build() {
+            return new Group(fabricItemGroupBuilder.build());
+        }
     }
 }

@@ -4,8 +4,8 @@
   "package": "top.frankyang.pre.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "CompoundTagAccessor",
     "PythonSystemInjector",
-    "RenderSystemInjector",
     "ResourcePackInjector",
     "TitleScreenInjector"
   ],

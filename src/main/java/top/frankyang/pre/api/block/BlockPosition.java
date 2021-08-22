@@ -30,4 +30,12 @@ public class BlockPosition extends DelegatedCastable<BlockPos> implements Vector
     public Integer getZ() {
         return delegate.getZ();
     }
+
+    @Override
+    public String toString() {
+        return "BlockPosition{" +
+            getX() + ", " +
+            getY() + ", " +
+            getZ() + '}';
+    }
 }

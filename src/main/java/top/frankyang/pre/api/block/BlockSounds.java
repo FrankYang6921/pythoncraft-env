@@ -4,11 +4,9 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import org.jetbrains.annotations.Nullable;
-import org.python.core.PyDictionary;
 import top.frankyang.pre.api.misc.DelegatedCastable;
-import top.frankyang.pre.api.util.TypedDictionary;
 
 /**
  * 包装类，包装原版类{@link BlockSoundGroup}。
@@ -18,30 +16,21 @@ public class BlockSounds extends DelegatedCastable<BlockSoundGroup> {
         super(delegate);
     }
 
-    /**
-     * 将一个Python字典解析为方块音效。
-     *
-     * @param dictionary 用于解析的Python字典。
-     * @return 解析后的<code>BlockSounds</code>实例。
-     */
-    public static BlockSounds of(@Nullable PyDictionary dictionary) {
-        TypedDictionary dict = new TypedDictionary(dictionary);
+    public static Builder of() {
+        return new Builder();
+    }
 
-        float volume = dict.getOrDefault("volume", Float.class, 1f);
-        float pitch = dict.getOrDefault("pitch", Float.class, 1f);
-        SoundEvent breakSound = dict.computeIfPresent("breakSound", String.class, s ->
-            Registry.SOUND_EVENT.get(new Identifier(s)), SoundEvents.BLOCK_STONE_BREAK);
-        SoundEvent placeSound = dict.computeIfPresent("placeSound", String.class, s ->
-            Registry.SOUND_EVENT.get(new Identifier(s)), SoundEvents.BLOCK_STONE_PLACE);
-        SoundEvent stepSound = dict.computeIfPresent("stepSound", String.class, s ->
-            Registry.SOUND_EVENT.get(new Identifier(s)), SoundEvents.BLOCK_STONE_STEP);
-        SoundEvent hitSound = dict.computeIfPresent("hitSound", String.class, s ->
-            Registry.SOUND_EVENT.get(new Identifier(s)), SoundEvents.BLOCK_STONE_HIT);
-        SoundEvent fallSound = dict.computeIfPresent("fallSound", String.class, s ->
-            Registry.SOUND_EVENT.get(new Identifier(s)), SoundEvents.BLOCK_STONE_FALL);
-
+    private static BlockSounds of(Builder builder) {
         return new BlockSounds(
-            new BlockSoundGroup(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound)
+            new BlockSoundGroup(
+                builder.volume,
+                builder.pitch,
+                builder.breakSound,
+                builder.placeSound,
+                builder.stepSound,
+                builder.hitSound,
+                builder.fallSound
+            )
         );
     }
 
@@ -71,5 +60,47 @@ public class BlockSounds extends DelegatedCastable<BlockSoundGroup> {
 
     public String getFallSound() {
         return delegate.getFallSound().getId().toString();
+    }
+
+    public static class Builder {
+        private float volume = 1f;
+        private float pitch = 1f;
+        private SoundEvent breakSound = SoundEvents.BLOCK_STONE_BREAK;
+        private SoundEvent placeSound = SoundEvents.BLOCK_STONE_PLACE;
+        private SoundEvent stepSound = SoundEvents.BLOCK_STONE_STEP;
+        private SoundEvent hitSound = SoundEvents.BLOCK_STONE_HIT;
+        private SoundEvent fallSound = SoundEvents.BLOCK_STONE_FALL;
+
+        public void volume(float volume) {
+            this.volume = volume;
+        }
+
+        public void pitch(float pitch) {
+            this.pitch = MathHelper.clamp(pitch, .5f, 2);
+        }
+
+        public void breakSoundId(String s) {
+            breakSound = Registry.SOUND_EVENT.get(new Identifier(s));
+        }
+
+        public void placeSoundId(String s) {
+            placeSound = Registry.SOUND_EVENT.get(new Identifier(s));
+        }
+
+        public void stepSoundId(String s) {
+            stepSound = Registry.SOUND_EVENT.get(new Identifier(s));
+        }
+
+        public void hitSoundId(String s) {
+            hitSound = Registry.SOUND_EVENT.get(new Identifier(s));
+        }
+
+        public void fallSoundId(String s) {
+            fallSound = Registry.SOUND_EVENT.get(new Identifier(s));
+        }
+
+        public BlockSounds build() {
+            return BlockSounds.of(this);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.util.reflection;
+package top.frankyang.pre.api.reflection;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,4 +21,11 @@ public @interface DynamicOverride {
      * @return 该方法是否是一个常量方法。
      */
     boolean constant() default false;
+
+    /**
+     * 表明该方法必须重写某个方法。如果该字段设为{@code false}，动态重写器在处理这个方法时倘若没有找到相应的父类方法，不会发生任何事，反之则会抛出一个异常，迫使程序崩溃。
+     *
+     * @return 该方法是否必须重写某个方法。
+     */
+    boolean required() default true;
 }

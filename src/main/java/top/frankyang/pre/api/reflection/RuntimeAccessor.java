@@ -1,7 +1,8 @@
-package top.frankyang.pre.api.util.reflection;
+package top.frankyang.pre.api.reflection;
 
 import org.jetbrains.annotations.Nullable;
 import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.reflection.mapping.SymbolResolver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,7 +36,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
 
         return new RuntimeAccessor<T>() {
             @Override
-            public Class<? extends T> getTargetClass() {
+            public Class<? extends T> getClazz() {
                 return clazz;
             }
 
@@ -49,7 +50,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
     /**
      * @return 该（静态）运行时访问器指向的类。
      */
-    Class<? extends T> getTargetClass();
+    Class<? extends T> getClazz();
 
     /**
      * @return 该运行时访问器指向的对象。
@@ -75,7 +76,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
             throw new IllegalStateException(
                 "Cannot access instance field '" + name + "' from this static-only runtime accessor!");
         }
-        Field field = SymbolResolver.getInstance().runtimeField(getTargetClass(), name);
+        Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         try {
             //noinspection unchecked
             return (U) field.get(getTarget());
@@ -92,7 +93,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
      * @return 获取到的静态字段。
      */
     default <U> U getStatic(String name) {
-        Field field = SymbolResolver.getInstance().runtimeField(getTargetClass(), name);
+        Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         if (!Modifier.isStatic(field.getModifiers())) {
             throw new IllegalStateException(
                 "Cannot access instance field '" + name + "' when explicitly accessing a static field!");
@@ -116,7 +117,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
             throw new IllegalStateException(
                 "Cannot access instance field '" + name + "' from this static-only runtime accessor!");
         }
-        Field field = SymbolResolver.getInstance().runtimeField(getTargetClass(), name);
+        Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         try {
             field.set(getTarget(), value);
         } catch (IllegalAccessException e) {
@@ -131,7 +132,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
      * @param value 字段值。
      */
     default void getStatic(String name, Object value) {
-        Field field = SymbolResolver.getInstance().runtimeField(getTargetClass(), name);
+        Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         if (!Modifier.isStatic(field.getModifiers())) {
             throw new IllegalStateException(
                 "Cannot access instance field '" + name + "' when explicitly accessing a static field!");
@@ -157,7 +158,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
             throw new IllegalStateException(
                 "Cannot access instance method '" + name + "' from this static-only runtime accessor!");
         }
-        Method method = SymbolResolver.getInstance().runtimeMethod(getTargetClass(), name, types);
+        Method method = SymbolResolver.getInstance().runtimeMethod(getClazz(), name, types);
         try {
             //noinspection unchecked
             return (U) method.invoke(getTarget(), args);
@@ -200,7 +201,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
      * @return 方法的返回值。
      */
     default <U> U invokeStatic(String name, Class<?>[] types, Object[] args) {
-        Method method = SymbolResolver.getInstance().runtimeMethod(getTargetClass(), name, types);
+        Method method = SymbolResolver.getInstance().runtimeMethod(getClazz(), name, types);
         if (!Modifier.isStatic(method.getModifiers())) {
             throw new IllegalStateException(
                 "Cannot access instance method '" + name + "' when explicitly accessing a static method!");

@@ -5,7 +5,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.python.core.PyDictionary;
 import top.frankyang.pre.api.AbstractRegistry;
 import top.frankyang.pre.api.block.type.BlockType;
 import top.frankyang.pre.api.item.ItemSettings;
@@ -39,8 +38,8 @@ public final class BlockRegistry extends AbstractRegistry {
      * @param id    方块的命名空间ID。
      * @param block 所要注册的方块实例。
      */
-    public void registerBlockOnly(String id, Object block) {
-        Registry.register(Registry.BLOCK, new Identifier(id), Castable.infer(block, Block.class));
+    public void registerBlockOnly(String id, BlockType block) {
+        Registry.register(Registry.BLOCK, new Identifier(id), block.cast());
     }
 
     /**
@@ -49,8 +48,8 @@ public final class BlockRegistry extends AbstractRegistry {
      * @param id            方块的命名空间ID。
      * @param blockSettings 所要注册的方块设置（Python字典，会自动解析设置并创建方块实例）。
      */
-    public void registerBlockOnly(String id, PyDictionary blockSettings) {
-        registerBlockOnly(id, new Block(BlockSettings.of(blockSettings).cast()));
+    public void registerBlockOnly(String id, BlockSettings blockSettings) {
+        registerBlockOnly(id, new BlockType(blockSettings));
     }
 
     /**
@@ -60,8 +59,8 @@ public final class BlockRegistry extends AbstractRegistry {
      * @param block 所要注册的方块实例。
      * @param item  所要注册的方块物品实例。
      */
-    public void registerBlock(String id, Object block, Object item) {
-        Registry.register(Registry.BLOCK, getIdentifier(id), Castable.infer(block, Block.class));
+    public void registerBlock(String id, BlockType block, Object item) {
+        Registry.register(Registry.BLOCK, getIdentifier(id), block.cast());
         Registry.register(Registry.ITEM, getIdentifier(id), Castable.infer(item, BlockItem.class));
     }
 
@@ -73,10 +72,9 @@ public final class BlockRegistry extends AbstractRegistry {
      * @param block        所要注册的方块实例。
      * @param itemSettings 所要注册的方块物品设置（Python字典，会自动解析设置并创建方块物品实例）。
      */
-    public void registerBlock(String id, Object block, PyDictionary itemSettings) {
-        Block block0 = Castable.infer(block, Block.class);
-        Registry.register(Registry.BLOCK, getIdentifier(id), block0);
-        Registry.register(Registry.ITEM, getIdentifier(id), new BlockItem(block0, ItemSettings.parse(itemSettings).cast()));
+    public void registerBlock(String id, BlockType block, ItemSettings itemSettings) {
+        Registry.register(Registry.BLOCK, getIdentifier(id), block.cast());
+        Registry.register(Registry.ITEM, getIdentifier(id), new BlockItem(block.cast(), itemSettings.cast()));
     }
 
     /**
@@ -86,10 +84,10 @@ public final class BlockRegistry extends AbstractRegistry {
      * @param blockSettings 所要注册的方块设置（Python字典，会自动解析设置并创建方块实例）。
      * @param itemSettings  所要注册的方块物品设置（Python字典，会自动解析设置并创建方块物品实例）。
      */
-    public void registerBlock(String id, PyDictionary blockSettings, PyDictionary itemSettings) {
-        Block block0 = new BlockType(BlockSettings.of(blockSettings)).cast();
-        Registry.register(Registry.BLOCK, getIdentifier(id), block0);
-        Registry.register(Registry.ITEM, getIdentifier(id), new BlockItem(block0, ItemSettings.parse(itemSettings).cast()));
+    public void registerBlock(String id, BlockSettings blockSettings, ItemSettings itemSettings) {
+        BlockType block = new BlockType(blockSettings);
+        Registry.register(Registry.BLOCK, getIdentifier(id), block.cast());
+        Registry.register(Registry.ITEM, getIdentifier(id), new BlockItem(block.cast(), itemSettings.cast()));
     }
 
     /**

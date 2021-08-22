@@ -6,8 +6,6 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.Version;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import top.frankyang.pre.python.internal.PythonThreadPool;
 import top.frankyang.pre.python.providers.StandaloneProvider;
 import top.frankyang.pre.util.Versions;
