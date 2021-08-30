@@ -24,21 +24,28 @@ import top.frankyang.pre.api.block.entity.BlockEntityFactory;
 import top.frankyang.pre.api.block.event.BlockEvent;
 import top.frankyang.pre.api.block.event.BlockInteractionEvent;
 import top.frankyang.pre.api.block.event.BlockUsageEvent;
+import top.frankyang.pre.api.block.event.EntityPhysicsEvent;
 import top.frankyang.pre.api.block.state.BlockStateFactory;
 import top.frankyang.pre.api.block.state.MutableBlockState;
+import top.frankyang.pre.api.entity.EntityImpl;
 import top.frankyang.pre.api.entity.PlayerImpl;
 import top.frankyang.pre.api.event.EventSources;
 import top.frankyang.pre.api.event.EventSourcesImpl;
 import top.frankyang.pre.api.event.EventType;
 import top.frankyang.pre.api.event.ExposedEventSources;
 import top.frankyang.pre.api.math.Facing;
-import top.frankyang.pre.api.reflection.DynamicOverride;
-import top.frankyang.pre.api.reflection.DynamicOverrider;
-import top.frankyang.pre.api.reflection.MethodContainer;
+import top.frankyang.pre.api.reflect.DynamicOverride;
+import top.frankyang.pre.api.reflect.DynamicOverrider;
+import top.frankyang.pre.api.reflect.MethodContainer;
 import top.frankyang.pre.api.util.ArrayUtils;
 import top.frankyang.pre.api.world.WorldImpl;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 public class BlockType extends DynamicOverrider<Block> implements ExposedEventSources<BlockEvent> {
+    private static final Map<Block, BlockType> map = new HashMap<>();
     private final EventSources<BlockEvent> eventSources = new EventSourcesImpl<>(
         "onBreakageStart",          // onBreak
         "onBreakageFinish",         // onBroken
@@ -60,24 +67,17 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
         this(settings, blockStateFactory, null);
     }
 
-    public BlockType(BlockSettings settings, BlockStateFactory blockStateFactory, BlockEntityFactory blockEntityFactory) {
+    public BlockType(BlockSettings settings,
+                     BlockStateFactory blockStateFactory,
+                     BlockEntityFactory blockEntityFactory) {
         this(settings, blockStateFactory, blockEntityFactory, new Class<?>[0]);
     }
 
-    protected BlockType(BlockSettings settings,
-                        BlockStateFactory blockStateFactory,
-                        BlockEntityFactory blockEntityFactory,
-                        Class<?>... interfaces) {
-        this(settings, blockStateFactory, blockEntityFactory, Block.class);
-
-    }
-
-    protected BlockType(BlockSettings settings,
-                        BlockStateFactory blockStateFactory,
-                        BlockEntityFactory blockEntityFactory,
-                        Class<? extends Block> targetClass,
-                        Class<?>... interfaces) {
-        super(targetClass,
+    public BlockType(BlockSettings settings,
+                     BlockStateFactory blockStateFactory,
+                     BlockEntityFactory blockEntityFactory,
+                     Class<?>... interfaces) {
+        super(Block.class,
             blockEntityFactory != null ?
                 ArrayUtils.mergeArrays(Class.class, interfaces, BlockEntityProvider.class) : interfaces
         );
@@ -89,6 +89,16 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
         if (blockEntityFactory != null) {
             blockEntityFactory.newType(this);
         }
+
+        map.put(cast(), this);
+    }
+
+    public static BlockType ofVanilla(Block block) {
+        return Objects.requireNonNull(map.get(block));
+    }
+
+    public static boolean isPythonCraft(Block block) {
+        return map.containsKey(block);
     }
 
     @Override
@@ -106,8 +116,8 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
 
     @DynamicOverride
     public void onBroken(WorldAccess world, BlockPos pos, BlockState state, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, pos, state);
-        if (!world.isClient())
+        superMethod.invoke(world, pos, state);
+        if (!world.isClient()) {
             trigger("onBreakageFinish", new BlockInteractionEvent(
                 EventType.BLOCK_BREAK_FINISH,
                 this,
@@ -116,37 +126,61 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
                 null,
                 new MutableBlockState(state, world, pos)
             ));
+        }
     }
 
     @DynamicOverride
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, pos, explosion);
+        superMethod.invoke(world, pos, explosion);
+        if (!world.isClient()) {
+            trigger("onDestroyedByExplosion", new BlockInteractionEvent(
+                EventType.BLOCK_BREAK_EXPLOSION,
+                this,
+                new BlockPosition(pos),
+                new WorldImpl(world),
+                null,
+                new MutableBlockState(world, pos)
+            ));
+        }
     }
 
     @DynamicOverride
     public void onSteppedOn(World world, BlockPos pos, Entity entity, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, pos, entity);
+        superMethod.invoke(world, pos, entity);
+        if (!world.isClient()) {
+            trigger("onEntitySteppedOn", new EntityPhysicsEvent(
+                EventType.BLOCK_LAND,
+                this,
+                new BlockPosition(pos),
+                new WorldImpl(world),
+                new EntityImpl(entity)
+            ));
+        }
     }
 
     @DynamicOverride
     public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, pos, state, placer, itemStack);
+        superMethod.invoke(world, pos, state, placer, itemStack);
     }
 
     @DynamicOverride
     public void onLandedUpon(World world, BlockPos pos, Entity entity, float distance, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, pos, entity, distance);
-    }
-
-    @DynamicOverride
-    public void onEntityLand(BlockView world, Entity entity, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, entity);
+        superMethod.invoke(world, pos, entity, distance);
+        if (!world.isClient()) {
+            trigger("onEntityLandedOn", new EntityPhysicsEvent(
+                EventType.BLOCK_LAND,
+                this,
+                new BlockPosition(pos),
+                new WorldImpl(world),
+                new EntityImpl(entity)
+            ));
+        }
     }
 
     @DynamicOverride
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, pos, state, player);
-        if (!world.isClient())
+        superMethod.invoke(world, pos, state, player);
+        if (!world.isClient()) {
             trigger("onBreakageStart", new BlockInteractionEvent(
                 EventType.BLOCK_BREAK_START,
                 this,
@@ -155,12 +189,13 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
                 new PlayerImpl(player),
                 new MutableBlockState(state, world, pos)
             ));
+        }
     }
 
     @DynamicOverride
     public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack, MethodContainer superMethod) {
-        superMethod.invokeLiteral(world, player, pos, state, blockEntity, stack);
-        if (!world.isClient())
+        superMethod.invoke(world, player, pos, state, blockEntity, stack);
+        if (!world.isClient()) {
             trigger("afterBreakage", new BlockInteractionEvent(
                 EventType.BLOCK_BREAK_AFTER,
                 this,
@@ -169,11 +204,15 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
                 new PlayerImpl(player),
                 new MutableBlockState(state, world, pos)
             ));
+        }
     }
 
     @DynamicOverride
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, MethodContainer superMethod) {
-        superMethod.invokeLiteral(state, world, pos, player, hand, hit);
+        ActionResult superResult = superMethod.invoke(state, world, pos, player, hand, hit);
+        if (superResult != ActionResult.PASS) {
+            return superResult;
+        }
         if (!world.isClient()) {
             trigger("onUsage", new BlockUsageEvent(
                 this,
@@ -185,7 +224,8 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
                 Facing.of(hit.getSide())
             ));
         }
-        return getEventSources().get("onUsage").getEventListeners().size() != 0 ? ActionResult.SUCCESS : ActionResult.PASS;
+
+        return getBackingMap().get("onUsage").getEventListeners().size() != 0 ? ActionResult.SUCCESS : ActionResult.PASS;
     }
 
     @DynamicOverride
@@ -193,7 +233,7 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
         if (blockStateFactory != null) {
             blockStateFactory.addProperties(stateManager::add);
         } else {
-            superMethod.invokeLiteral(stateManager);
+            superMethod.invoke(stateManager);
         }
     }
 
@@ -203,7 +243,7 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
     }
 
     @Override
-    public EventSources<BlockEvent> getDelegate() {
+    public EventSources<BlockEvent> getDelegateEventSources() {
         return eventSources;
     }
 }

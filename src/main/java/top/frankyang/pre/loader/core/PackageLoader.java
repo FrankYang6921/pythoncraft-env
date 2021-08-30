@@ -115,7 +115,7 @@ public class PackageLoader implements AutoCloseable, Closeable {
         HashMap<Package, Future<?>> futures = new HashMap<>();
 
         for (Package pkg : packages) {
-            futures.put(pkg, pkg.onConstruction(PythonCraft.getInstance().getPythonThreadPool()));
+            futures.put(pkg, pkg.onConstruction(PythonCraft.getInstance().getThreadPool()));
         }
 
         futures.forEach((pkg, future) -> {
@@ -144,7 +144,7 @@ public class PackageLoader implements AutoCloseable, Closeable {
 
         for (Iterator<Package> iterator = packages.iterator(); iterator.hasNext(); ) {
             Package pkg = iterator.next();
-            futures.add(pkg.onDestruction(PythonCraft.getInstance().getPythonThreadPool()));
+            futures.add(pkg.onDestruction(PythonCraft.getInstance().getThreadPool()));
             iterator.remove();
         }
 

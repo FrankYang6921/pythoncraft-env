@@ -2,6 +2,7 @@ package top.frankyang.pre.api.block.state;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Property;
+import top.frankyang.pre.api.block.type.BlockType;
 import top.frankyang.pre.api.misc.DelegatedCastable;
 
 import java.util.HashMap;
@@ -22,6 +23,11 @@ public class ImmutableBlockState extends DelegatedCastable<BlockState> implement
     }
 
     public Comparable<?> getProperty(String key) {
-        return delegate.get(Objects.requireNonNull(properties.get(key), "No such key present: " + key));
+        return delegate.get(properties.get(key));
+    }
+
+    @Override
+    public BlockType getBlockType() {
+        return BlockType.ofVanilla(delegate.getBlock());
     }
 }

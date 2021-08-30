@@ -29,7 +29,7 @@ public class EventSourcesImpl<T extends Event> implements EventSources<T> {
         Objects.requireNonNull(eventSources.get(type), "No such event type present: " + type).unsubscribe(listener);
     }
 
-    public Map<String, EventSource<T>> getEventSources() {
+    public Map<String, EventSource<T>> getBackingMap() {
         return Collections.unmodifiableMap(eventSources);
     }
 

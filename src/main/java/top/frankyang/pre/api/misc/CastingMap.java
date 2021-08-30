@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 /**
- *
  * 该接口用于创建一个表，可以将上游表的访问映射到另一个类。
  *
  * @param <K> 该表和上游表的键类型。
@@ -83,12 +83,12 @@ public interface CastingMap<K, S, D> extends Map<K, D> {
         return keySet().stream().map(k -> new CastingEntry<>(this, k)).collect(Collectors.toSet());
     }
 
-    class CastingEntry<K, S, D> implements Entry<K, D> {
+    final class CastingEntry<K, S, D> implements Entry<K, D> {
         private final CastingMap<K, S, D> map;
         private final K key;
         private volatile D value;
 
-        public CastingEntry(CastingMap<K, S, D> map, K key) {
+        private CastingEntry(CastingMap<K, S, D> map, K key) {
             this.map = map;
             this.key = key;
             this.value = map.get(key);

@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.reflection.mapping;
+package top.frankyang.pre.api.reflect.mapping;
 
 import net.fabricmc.mapping.tree.ClassDef;
 import net.fabricmc.mapping.tree.FieldDef;

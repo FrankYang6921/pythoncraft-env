@@ -1,6 +1,7 @@
 package top.frankyang.pre.api.block.state;
 
 import net.minecraft.block.BlockState;
+import top.frankyang.pre.api.block.type.BlockType;
 import top.frankyang.pre.api.misc.Castable;
 
 /**
@@ -100,4 +101,6 @@ public interface BlockStateLike extends Castable<BlockState> {
         setProperty(key, value);
         return this;
     }
+
+    BlockType getBlockType();
 }

@@ -1,4 +1,4 @@
-package top.frankyang.pre.mixin;
+package top.frankyang.pre.mixin.patch;
 
 import jnr.posix.util.Platform;
 import org.apache.logging.log4j.LogManager;
@@ -7,7 +7,7 @@ import org.python.core.PrePy;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import top.frankyang.pre.api.Minecraft;
+import top.frankyang.pre.api.util.GameUtils;
 import top.frankyang.pre.loader.exceptions.RuntimeIOException;
 
 import javax.swing.*;
@@ -32,7 +32,7 @@ public class PythonSystemInjector {
     }
 
     private static URI toDefaultFileSystem(URI uri) throws IOException {
-        Path dst = Minecraft.getGamePath().resolve(".jython-runtime.jar");
+        Path dst = GameUtils.getGamePath().resolve(".jython-runtime.jar");
         if (!Files.exists(dst)) {
             JOptionPane.showMessageDialog(
                 null, "这是您第一次使用PythonCraft Runtime Environment。由于需要解压运行时文件，游戏启动可能较慢，请耐心等待，" +

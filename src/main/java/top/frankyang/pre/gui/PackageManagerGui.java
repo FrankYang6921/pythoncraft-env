@@ -8,7 +8,7 @@ import io.github.cottonmc.cotton.gui.widget.WGridPanel;
 import io.github.cottonmc.cotton.gui.widget.WScrollPanel;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import net.fabricmc.fabric.api.util.TriState;
-import top.frankyang.pre.api.Minecraft;
+import top.frankyang.pre.api.util.GameUtils;
 import top.frankyang.pre.loader.core.PackageInfo;
 
 import java.util.stream.Stream;
@@ -32,7 +32,7 @@ public final class PackageManagerGui extends LightweightGuiDescription {
     }
 
     public static void open(Stream<PackageInfo> stream) {
-        Minecraft.getClient().openScreen(new PackageManagerScreen(new PackageManagerGui(stream)));
+        GameUtils.getClient().openScreen(new PackageManagerScreen(new PackageManagerGui(stream)));
     }
 
     private static class PackageManagerScreen extends CottonClientScreen {

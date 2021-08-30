@@ -1,7 +1,7 @@
-package top.frankyang.pre.api.math;
+package top.frankyang.pre.api.util;
 
 import sun.misc.Unsafe;
-import top.frankyang.pre.api.util.Classes;
+import top.frankyang.pre.api.util.ReflectUtils;
 
 import java.util.function.Consumer;
 
@@ -18,7 +18,7 @@ public interface LooseConsumer<T> extends Consumer<T> {
         try {
             accept0();
         } catch (Throwable throwable) {
-            Classes.forceThrow(throwable);
+            ReflectUtils.forceThrow(throwable);
         }
     }
 }

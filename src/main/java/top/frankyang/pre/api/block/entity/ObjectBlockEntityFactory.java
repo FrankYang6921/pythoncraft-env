@@ -1,8 +1,8 @@
 package top.frankyang.pre.api.block.entity;
 
 import sun.misc.Unsafe;
-import top.frankyang.pre.api.math.LooseSupplier;
-import top.frankyang.pre.api.util.Classes;
+import top.frankyang.pre.api.util.LooseSupplier;
+import top.frankyang.pre.api.util.ReflectUtils;
 
 import java.lang.reflect.Constructor;
 import java.util.function.Supplier;
@@ -44,7 +44,7 @@ public class ObjectBlockEntityFactory<T> extends BlockEntityFactory {
      * @return 创建的工厂。
      */
     public static <T> ObjectBlockEntityFactory<T> ofForce(Class<T> clazz) {
-        return new ObjectBlockEntityFactory<>(() -> Classes.forceNew(clazz));
+        return new ObjectBlockEntityFactory<>(() -> ReflectUtils.forceNew(clazz));
     }
 
     @Override

@@ -1,8 +1,8 @@
-package top.frankyang.pre.api.reflection;
+package top.frankyang.pre.api.reflect;
 
 import org.jetbrains.annotations.Nullable;
 import top.frankyang.pre.api.misc.Castable;
-import top.frankyang.pre.api.reflection.mapping.SymbolResolver;
+import top.frankyang.pre.api.reflect.mapping.SymbolResolver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -131,7 +131,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
      * @param name  字段名。
      * @param value 字段值。
      */
-    default void getStatic(String name, Object value) {
+    default void setStatic(String name, Object value) {
         Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         if (!Modifier.isStatic(field.getModifiers())) {
             throw new IllegalStateException(

@@ -34,7 +34,7 @@ public final class ItemRegistry extends AbstractRegistry {
      * @param id   所注册物品的命名空间ID。
      * @param item 所要注册的物品实例。
      */
-    public synchronized void registerItem(String id, Object item) {  // TODO 不用Object
+    public synchronized void registerItem(String id, Object item) {  // TODO wrap class `Item`
         Registry.register(Registry.ITEM, getIdentifier(id), Castable.infer(item, Item.class));
     }
 

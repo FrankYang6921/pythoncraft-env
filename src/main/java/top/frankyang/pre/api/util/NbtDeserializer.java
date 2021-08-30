@@ -28,7 +28,7 @@ public class NbtDeserializer {
      * @return dst
      */
     public static Object deserializeTo(NbtObject nbt, Object dst) {
-        Classes.assignTo(deserialize(nbt), dst);
+        ReflectUtils.assignTo(deserialize(nbt), dst);
         return dst;
     }
 
@@ -74,9 +74,9 @@ public class NbtDeserializer {
         String uuid = ((NbtString) nbt.get("uuid")).get();
         NbtObject payload = ((NbtObject) nbt.get("payload"));
         Class<?> clazz = Class.forName(cls);
-        Object instance = Classes.forceNew(clazz);
+        Object instance = ReflectUtils.forceNew(clazz);
         refMap.put(uuid, instance);
-        List<Field> fields = Classes.getInstanceFields(clazz);
+        List<Field> fields = ReflectUtils.getInstanceFields(clazz);
         for (Field field : fields) {
             String key = field.getName();
             Object value = deserialize0((NbtObject) payload.get(key));

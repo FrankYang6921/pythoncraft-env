@@ -1,4 +1,4 @@
-package top.frankyang.pre.mixin;
+package top.frankyang.pre.mixin.misc;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;

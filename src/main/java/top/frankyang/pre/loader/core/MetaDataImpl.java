@@ -41,7 +41,7 @@ public class MetaDataImpl implements MetaData {
         String thumbnailPath = wrapper.getThumbnailPath();
         this.thumbnail = thumbnailPath != null ? packageRoot.resolve(wrapper.getThumbnailPath()) : null;
 
-        packageVersion = Versions.of(Objects.requireNonNull(
+        packageVersion = Versions.ofNonNull(Objects.requireNonNull(
             wrapper.getPackageVersion(), "Missing key: 'packageVersion' in metadata."
         ));
 

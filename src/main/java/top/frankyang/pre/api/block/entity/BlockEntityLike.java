@@ -31,7 +31,9 @@ public interface BlockEntityLike extends Castable<BlockEntity> {
     /**
      * 要求持久化。由于在Minecraft中方块实体的数据是缓存的，因此如果您修改了方块实体中的数据，应当调用此方法要求Minecraft对该方块实体进行持久化。否则您的修改很有可能会丢失。
      */
-    void acquirePersistence();
+    default void acquirePersistence() {
+        cast().markDirty();
+    }
 
     /**
      * 获取当前方块实体所对应的方块状态。

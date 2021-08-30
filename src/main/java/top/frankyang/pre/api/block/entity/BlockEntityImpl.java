@@ -4,7 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import top.frankyang.pre.api.block.state.BlockStateLike;
-import top.frankyang.pre.api.block.state.ImmutableBlockState;
+import top.frankyang.pre.api.block.state.MutableBlockState;
 import top.frankyang.pre.api.misc.DelegatedCastable;
 import top.frankyang.pre.api.nbt.NbtObject;
 
@@ -15,10 +15,6 @@ public abstract class BlockEntityImpl extends DelegatedCastable<BlockEntity> imp
     protected BlockEntityImpl(BlockEntityFactory factory) {
         this.factory = factory;
         delegate = new MyBlockEntity(factory);
-    }
-
-    public void acquirePersistence() {
-        delegate.markDirty();
     }
 
     public BlockStateLike getState() {
@@ -53,10 +49,9 @@ public abstract class BlockEntityImpl extends DelegatedCastable<BlockEntity> imp
         }
 
         @Override
-        public void fromTag(BlockState state, CompoundTag tag) {
-            super.fromTag(state, tag);
-            BlockEntityImpl.this.state = new ImmutableBlockState(state);
-            deserialize(BlockEntityImpl.this.state, NbtObject.of(tag));
+        public void fromTag(BlockState state0, CompoundTag tag) {
+            deserialize(state = new MutableBlockState(state0, getWorld(), getPos()), NbtObject.of(tag));
+            super.fromTag(state0, tag);
         }
     }
 }

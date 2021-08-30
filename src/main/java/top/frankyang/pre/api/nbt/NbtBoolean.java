@@ -1,12 +1,13 @@
 package top.frankyang.pre.api.nbt;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.nbt.ByteTag;
-import top.frankyang.pre.loader.exceptions.ImpossibleException;
 
 /**
  * NBT布尔类。NBT数组可以存储布尔型的数据。注意，NBT本身并不能储存布尔值，实际上，这个标签将{@code true}存储为{@code 1b}，将{@code false}存储为{@code 0b}，某种程度上类似于{@link NbtNumber.NbtByte}。正因为如此，我们不推荐你将它存储于方块实体等要被序列化的容器中。
  */
-public class NbtBoolean extends NbtNumber<ByteTag, Boolean> implements NbtPrimitive<Boolean> {
+public class NbtBoolean extends Nbt<ByteTag> implements NbtPrimitive<Boolean> {
     private NbtBoolean(ByteTag delegate) {
         super(delegate);
     }
@@ -32,11 +33,6 @@ public class NbtBoolean extends NbtNumber<ByteTag, Boolean> implements NbtPrimit
     }
 
     @Override
-    protected String getSuffix() {
-        throw new ImpossibleException();
-    }
-
-    @Override
     public Boolean get() {
         return delegate.getByte() > 0;
     }
@@ -47,7 +43,7 @@ public class NbtBoolean extends NbtNumber<ByteTag, Boolean> implements NbtPrimit
     }
 
     @Override
-    public String toString() {
-        return get() ? "1b" : "0b";
+    public JsonElement toJson() {
+        return new JsonPrimitive(get());
     }
 }

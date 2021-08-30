@@ -1,18 +1,21 @@
 package top.frankyang.pre.api.nbt;
 
 import com.google.common.base.Strings;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.Tag;
 import top.frankyang.pre.api.misc.CastingMap;
-import top.frankyang.pre.mixin.CompoundTagAccessor;
+import top.frankyang.pre.mixin.reflect.CompoundTagAccessor;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import static top.frankyang.pre.api.util.ReflectUtils.tryThrow;
 
 /**
  * NBT表。就像{@link java.util.Map}，它定义了一个可以存储NBT数据的表。该对象可以按照键取得一个NBT对象，并且通过{@link NbtObject#getByte(String)}等方法，您可以直接获取任意一个NBT类型的对象而无需强制转型。得利于Python的动态性，对于Python，使用{@link NbtObject#get(Object)}方法通常就足够了。
@@ -76,11 +79,7 @@ public class NbtObject extends Nbt<CompoundTag> implements CastingMap<String, Ta
      * @return 解析的NBT表。
      */
     public static NbtObject parse(String string) {
-        try {
-            return NbtObject.of(new StringNbtReader(new StringReader(string)).parseCompoundTag());
-        } catch (CommandSyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return tryThrow(() -> NbtObject.of(new StringNbtReader(new StringReader(string)).parseCompoundTag()));
     }
 
     @Override
@@ -256,12 +255,18 @@ public class NbtObject extends Nbt<CompoundTag> implements CastingMap<String, Ta
             .toString();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <U extends Nbt<CompoundTag>> U deepCopy() {
+    public NbtObject deepCopy() {
         NbtObject newNbtObject = NbtObject.empty();
         forEach((k, v) ->
             newNbtObject.put(k, v.deepCopy()));
-        return (U) newNbtObject;
+        return newNbtObject;
+    }
+
+    @Override
+    public JsonElement toJson() {
+        JsonObject object = new JsonObject();
+        forEach((k, v) -> object.add(k, v.toJson()));
+        return object;
     }
 }

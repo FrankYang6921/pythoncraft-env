@@ -2,7 +2,7 @@ package top.frankyang.pre.main;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import top.frankyang.pre.api.Minecraft;
+import top.frankyang.pre.api.util.GameUtils;
 import top.frankyang.pre.gui.swing.PackageExceptionFrame;
 import top.frankyang.pre.loader.PackageManager;
 import top.frankyang.pre.loader.core.Pack;
@@ -27,7 +27,7 @@ public final class PythonCraft extends AbstractPythonCraft {
 
     protected void initialize() {
         packageManager = new PackageManager(() ->
-            new PackageLoader(Minecraft.getPackagesPath())
+            new PackageLoader(GameUtils.getPackagesPath())
         );
         packageManager.tryToConstruct(PackageExceptionFrame::open);
     }

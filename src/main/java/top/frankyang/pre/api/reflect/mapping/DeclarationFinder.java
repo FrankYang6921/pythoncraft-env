@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.reflection.mapping;
+package top.frankyang.pre.api.reflect.mapping;
 
 import java.util.Map;
 import java.util.Objects;

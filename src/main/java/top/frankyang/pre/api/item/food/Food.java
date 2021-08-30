@@ -44,7 +44,7 @@ public class Food extends DelegatedCastable<FoodComponent> implements FoodLike {
             return this;
         }
 
-        public Food.Builder statusEffect(StatusEffectInstance effect, float chance) {  // TODO 包装状态效果
+        public Food.Builder statusEffect(StatusEffectInstance effect, float chance) {  // TODO add status effects
             foodComponentBuilder.statusEffect(effect, chance);
             return this;
         }

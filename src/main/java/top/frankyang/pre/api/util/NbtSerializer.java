@@ -68,17 +68,17 @@ public class NbtSerializer {
         } catch (Exception ignored) {
             // Some objects refuse to hash. We ignore them.
         }
-        if (Classes.isPrimitiveWrapper(object.getClass()))
+        if (ReflectUtils.isPrimitiveWrapper(object.getClass()))
             return serializePrimitive(object);
-        if (Classes.isPrimitiveArray(object.getClass()))
+        if (ReflectUtils.isPrimitiveArray(object.getClass()))
             return serializePrimitiveArray(object);
-        if (Classes.isReferenceArray(object.getClass()))
+        if (ReflectUtils.isReferenceArray(object.getClass()))
             return serializeReferenceArray(object);
         return serializeObject(object);
     }
 
     private NbtObject serializeObject(Object object) throws ReflectiveOperationException {
-        List<Field> fields = Classes.getInstanceFields(object.getClass());
+        List<Field> fields = ReflectUtils.getInstanceFields(object.getClass());
         NbtObject root = NbtObject.empty();
         NbtObject wrapper = wrap(object, root, "obj");
         for (Field field : fields) {

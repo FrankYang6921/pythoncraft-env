@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.reflection;
+package top.frankyang.pre.api.reflect;
 
 import com.mojang.datafixers.util.Pair;
 import net.sf.cglib.proxy.Enhancer;
@@ -6,7 +6,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.jetbrains.annotations.NotNull;
 import top.frankyang.pre.api.misc.Castable;
-import top.frankyang.pre.api.reflection.mapping.SymbolResolver;
+import top.frankyang.pre.api.reflect.mapping.SymbolResolver;
 import top.frankyang.pre.api.util.ArrayUtils;
 
 import java.lang.reflect.Method;
@@ -47,13 +47,14 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
      * 创建一个动态重写器。在使用目标对象之前，应当先调用{@link DynamicOverrider#superConstructor(Class[], Object...)}。
      *
      * @param targetClass 目标类。
+     * @param interfaces  要实现的接口。
      */
     public DynamicOverrider(Class<? extends T> targetClass, Class<?>... interfaces) {
         super();
 
         for (Class<?> $interface : interfaces) {
             if (!$interface.isInterface()) {
-                throw new IllegalArgumentException("Class passed in as an interface (" + $interface.getName() + ") is not an interface.");
+                throw new IllegalArgumentException("The class object passed in as an interface (" + $interface.getName() + ") is not an interface.");
             }
         }
 
@@ -128,17 +129,24 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
     }
 
     private static boolean isCompatible(Method source, Method override) {
-        Class<?>[] srcTypes = ArrayUtils.mergeArrays(
+        Class<?>[] srcTypes1 = ArrayUtils.mergeArrays(
             Class.class, source.getParameterTypes(), MethodContainer.class
         );
+        Class<?>[] srcTypes2 = source.getParameterTypes();
         Class<?>[] dstTypes = override.getParameterTypes();
-        if (srcTypes.length != dstTypes.length) {
-            return false;
+        if (srcTypes1.length == dstTypes.length) {
+            for (int i = 0; i < srcTypes1.length; i++) {
+                if (!dstTypes[i].isAssignableFrom(srcTypes1[i])) return false;
+            }
+            return source.getReturnType().isAssignableFrom(override.getReturnType());
         }
-        for (int i = 0; i < srcTypes.length; i++) {
-            if (!dstTypes[i].isAssignableFrom(srcTypes[i])) return false;
+        if (srcTypes2.length == dstTypes.length) {
+            for (int i = 0; i < srcTypes1.length; i++) {
+                if (!dstTypes[i].isAssignableFrom(srcTypes2[i])) return false;
+            }
+            return source.getReturnType().isAssignableFrom(override.getReturnType());
         }
-        return source.getReturnType().isAssignableFrom(override.getReturnType());
+        return false;
     }
 
     private Object invoke(Method method) {
@@ -151,18 +159,18 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
 
     @Override
     public final Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-        MethodWrapper finder = new MethodWrapper(method);
-        if (noOverrides.contains(finder)) {
+        MethodWrapper wrapper = new MethodWrapper(method);
+        if (noOverrides.contains(wrapper)) {
             return proxy.invokeSuper(obj, args);
         }
-        if (constants.containsKey(finder)) {
-            return constants.get(finder);
+        if (constants.containsKey(wrapper)) {
+            return constants.get(wrapper);
         }
         MethodContainer container = new MethodContainer() {
             @Override
             public Object invoke0(Object[] args0) {
                 try {
-                    return proxy.invokeSuper(obj, args0);
+                    return proxy.invokeSuper(obj, args);
                 } catch (Throwable throwable) {
                     throw new RuntimeException(throwable);
                 }
@@ -178,8 +186,14 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
                 return method.getReturnType();
             }
         };
-        if (overrides.containsKey(finder)) {
-            Method override = overrides.get(finder);
+        if (overrides.containsKey(wrapper)) {
+            Method override = overrides.get(wrapper);
+            if (override.getParameterCount() == args.length) {
+                return override.invoke(this, args);
+            }
+            if (override.getParameterCount() != args.length + 1) {
+                throw new IllegalArgumentException(override + "");
+            }
             return override.invoke(this, ArrayUtils.mergeArrays(Object.class, args, container));
         }
         return proxy.invokeSuper(obj, args);
@@ -225,13 +239,13 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
             return this.method.getName().equals(that.method.getName()) &&
                 Arrays.equals(
                     this.method.getParameterTypes(),
-                    that.method.getParameterTypes());
+                    that.method.getParameterTypes()
+                );
         }
 
         @Override
         public int hashCode() {
-            return method.getName().hashCode() ^
-                Arrays.hashCode(method.getParameterTypes());
+            return method.getName().hashCode() ^ Arrays.hashCode(method.getParameterTypes());
         }
     }
 }

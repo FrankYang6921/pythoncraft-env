@@ -3,13 +3,13 @@ package top.frankyang.pre.util;
 import net.fabricmc.loader.util.version.SemanticVersionImpl;
 
 public final class Versions {
-    public static final SemanticVersionImpl ANY = of("x.x.x");
+    public static final SemanticVersionImpl ANY = ofNonNull("x.x.x");
 
     private Versions() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static SemanticVersionImpl of(String string) {
+    public static SemanticVersionImpl ofNonNull(String string) {
         try {
             return new SemanticVersionImpl(string, true);
         } catch (Exception e) {
@@ -20,7 +20,7 @@ public final class Versions {
     public static SemanticVersionImpl ofNullable(String string) {
         if (string == null)
             return ANY;
-        return of(string);
+        return ofNonNull(string);
     }
 
     public static String toString(SemanticVersionImpl version) {

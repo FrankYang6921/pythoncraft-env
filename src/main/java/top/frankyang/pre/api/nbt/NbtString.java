@@ -1,5 +1,7 @@
 package top.frankyang.pre.api.nbt;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.nbt.StringTag;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -44,5 +46,10 @@ public class NbtString extends Nbt<StringTag> implements NbtPrimitive<String> {
     @Override
     public String toString() {
         return "\"" + StringEscapeUtils.escapeJava(get()) + "\"";
+    }
+
+    @Override
+    public JsonElement toJson() {
+        return new JsonPrimitive(get());
     }
 }

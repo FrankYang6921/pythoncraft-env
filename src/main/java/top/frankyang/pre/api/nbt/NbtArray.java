@@ -11,7 +11,10 @@ import java.util.List;
  * @param <T> 该NBT数组所持有的NBT类型所包装的NBT标签类型。
  * @param <U> 该NBT数组所持有的NBT类型。
  */
-public abstract class NbtArray<T extends Tag, U extends Nbt<? extends T>> extends Nbt<AbstractListTag<T>> implements NbtCollection<T, U> {
+public abstract class NbtArray<T extends Tag, U extends Nbt<T>>
+    extends Nbt<AbstractListTag<T>>
+    implements NbtCollection<T, U> {
+
     protected NbtArray(AbstractListTag<T> delegate) {
         super(delegate);
     }

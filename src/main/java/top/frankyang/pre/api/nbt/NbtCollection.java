@@ -1,7 +1,10 @@
 package top.frankyang.pre.api.nbt;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import net.minecraft.nbt.Tag;
 import top.frankyang.pre.api.misc.CastingList;
+import top.frankyang.pre.api.misc.JsonCastable;
 
 /**
  * NBT集合类。就像{@link java.util.Collection}，它定义了一个可以存储NBT数据的集合对象。该对象可以按照索引取得一个NBT对象，并且通过{@link NbtCollection#getByte(int)}等方法，您可以直接获取任意一个NBT类型的对象而无需强制转型。得利于Python的动态性，对于Python，使用{@link NbtCollection#get(int)}方法通常就足够了。
@@ -9,7 +12,7 @@ import top.frankyang.pre.api.misc.CastingList;
  * @param <T> 该NBT集合所持有的NBT类型所包装的NBT标签类型。
  * @param <U> 该NBT集合所持有的NBT类型。
  */
-public interface NbtCollection<T extends Tag, U extends Nbt<? extends T>> extends CastingList<T, U> {
+public interface NbtCollection<T extends Tag, U extends Nbt<?>> extends CastingList<T, U>, JsonCastable {
     /**
      * 按指定类型在集合中获取一个对象。
      *
@@ -157,5 +160,14 @@ public interface NbtCollection<T extends Tag, U extends Nbt<? extends T>> extend
      */
     default NbtString getString(int index) {
         return getAsClass(index, NbtString.class);
+    }
+
+    @Override
+    default JsonElement toJson() {
+        JsonArray array = new JsonArray();
+        for (U u : this) {
+            array.add(u.toJson());
+        }
+        return array;
     }
 }

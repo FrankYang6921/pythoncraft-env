@@ -2,12 +2,17 @@ package top.frankyang.pre.api.util;
 
 import sun.misc.Unsafe;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public final class Classes {
+/**
+ * 一个类，可以在反射中干各种各样强制性的事情。
+ */
+public final class ReflectUtils {
     private static final Unsafe theUnsafe;
     private static final Set<Class<?>> primitiveWrappers =
         Collections.unmodifiableSet(new HashSet<Class<?>>() {{
@@ -32,7 +37,7 @@ public final class Classes {
         }
     }
 
-    private Classes() {
+    private ReflectUtils() {
     }
 
     public static Unsafe getTheUnsafe() {
@@ -52,15 +57,32 @@ public final class Classes {
         theUnsafe.throwException(throwable);
     }
 
+    public static void tryThrow(LooseRunnable runnable) {
+        runnable.run();
+    }
+
+    public static <T> T tryThrow(LooseSupplier<T> supplier) {
+        return supplier.get();
+    }
+
     public static Set<Field> getAllFields(Class<?> c) {
         Set<Field> set = new HashSet<>();
         Collections.addAll(set, c.getDeclaredFields());
         Collections.addAll(set, c.getFields());
+        if (c.getInterfaces().length != 0) {
+            for (Class<?> $interface : c.getInterfaces()) {
+                set.addAll(getAllFields($interface));
+            }
+        }
+        Class<?> superClass = c.getSuperclass();
+        if (superClass != null) {
+            set.addAll(getAllFields(superClass));
+        }
         return Collections.unmodifiableSet(set);
     }
 
     public static List<Field> getInstanceFields(Class<?> c) {
-        return Classes.getAllFields(c)
+        return ReflectUtils.getAllFields(c)
             .stream()
             .peek(f -> f.setAccessible(true))
             .filter(f -> !Modifier.isStatic(f.getModifiers()))
@@ -68,7 +90,7 @@ public final class Classes {
     }
 
     public static List<Field> getStaticFields(Class<?> c) {
-        return Classes.getAllFields(c)
+        return ReflectUtils.getAllFields(c)
             .stream()
             .peek(f -> f.setAccessible(true))
             .filter(f -> Modifier.isStatic(f.getModifiers()))
@@ -91,10 +113,7 @@ public final class Classes {
         return c.isArray() && !c.getComponentType().isPrimitive();
     }
 
-    public static Object assignTo(Object src, Object dst) {
-        if (!src.getClass().isAssignableFrom(dst.getClass())) {
-            throw new IllegalArgumentException(src + ", " + dst);
-        }
+    public static <T, U extends T> U assignTo(T src, U dst) {
         for (Field field : getInstanceFields(src.getClass())) {
             try {
                 field.set(dst, field.get(src));
@@ -104,6 +123,18 @@ public final class Classes {
         }
         return dst;
     }
+
+    public static <T, U extends T> U deepAssignTo(T src, U dst) {
+        for (Field field : getInstanceFields(src.getClass())) {
+            try {
+                field.set(dst, CopyUtils.deepCopy(field.get(src)));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return dst;
+    }
+
 
     public static Set<Class<?>> getSuperClasses(Class<?> c) {
         return getSuperClasses(c, new HashSet<>());
@@ -117,5 +148,45 @@ public final class Classes {
         }
         ret.add(superclass);
         return getSuperClasses(superclass, ret);
+    }
+
+    public static Object invokeStatic(String methodName) {
+        return tryThrow(() -> {
+            Method method = MethodHandles.lookup().lookupClass().getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            return method.invoke(null);
+        });
+    }
+
+    public static Field findField(Class<?> clazz, String name) {
+        try {
+            return clazz.getDeclaredField(name);
+        } catch (ReflectiveOperationException e) {
+            // Search in parents
+            List<Field> results = new ArrayList<>();
+            for (Class<?> cls : clazz.getInterfaces()) {
+                results.add(findField(cls, name));
+            }
+            Class<?> cls = clazz.getSuperclass();
+            if (cls != null)
+                results.add(findField(cls, name));
+            return results.stream().filter(Objects::nonNull).findFirst().orElse(null);
+        }
+    }
+
+    public static Method findMethod(Class<?> clazz, String name, Class<?>... paramTypes) {
+        try {
+            return clazz.getDeclaredMethod(name, paramTypes);
+        } catch (ReflectiveOperationException e) {
+            // Search in parents
+            List<Method> results = new ArrayList<>();
+            for (Class<?> cls : clazz.getInterfaces()) {
+                results.add(findMethod(cls, name));
+            }
+            Class<?> cls = clazz.getSuperclass();
+            if (cls != null)
+                results.add(findMethod(cls, name));
+            return results.stream().filter(Objects::nonNull).findFirst().orElse(null);
+        }
     }
 }

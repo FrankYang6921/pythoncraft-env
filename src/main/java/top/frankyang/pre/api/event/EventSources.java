@@ -40,5 +40,5 @@ public interface EventSources<T extends Event> {
      */
     void unsubscribe(String type, EventListener<? super T> listener);
 
-    Map<String, EventSource<T>> getEventSources();
+    Map<String, EventSource<T>> getBackingMap();
 }

@@ -98,12 +98,11 @@ public class NbtList extends Nbt<ListTag> implements NbtCollection<Tag, Nbt<?>> 
             .toString();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <U extends Nbt<ListTag>> U deepCopy() {
+    public NbtList deepCopy() {
         NbtList newNbtList = NbtList.empty();
         forEach(i ->
             newNbtList.add(i.deepCopy()));
-        return (U) newNbtList;
+        return newNbtList;
     }
 }

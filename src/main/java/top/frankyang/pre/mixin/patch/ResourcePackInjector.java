@@ -1,4 +1,4 @@
-package top.frankyang.pre.mixin;
+package top.frankyang.pre.mixin.patch;
 
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil;

@@ -13,7 +13,7 @@ public interface GroupLike extends Castable<ItemGroup> {
      *
      * @return 图标。。
      */
-    default ItemStack getIcon() {  // TODO 用包装类替换ItemStack
+    default ItemStack getIcon() {  // TODO wrap class `ItemStack`
         return cast().getIcon();
     }
 

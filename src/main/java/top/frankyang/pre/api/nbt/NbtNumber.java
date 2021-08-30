@@ -1,5 +1,7 @@
 package top.frankyang.pre.api.nbt;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.nbt.*;
 
 /**
@@ -8,7 +10,7 @@ import net.minecraft.nbt.*;
  * @param <T> 该NBT数字所持有的NBT类型所包装的NBT标签类型。
  * @param <U> 该NBT数字所持有的NBT类型。
  */
-public abstract class NbtNumber<T extends AbstractNumberTag, U> extends Nbt<T> implements NbtPrimitive<U> {
+public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> extends Nbt<T> implements NbtPrimitive<U> {
     protected NbtNumber(T delegate) {
         super(delegate);
     }
@@ -55,11 +57,35 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U> extends Nbt<T> i
         return NbtDouble.of(DoubleTag.of(aDouble));
     }
 
+    public static NbtNumber<?, ?> of(Number number) {
+        if (number instanceof Byte) {
+            return ofByte(number.byteValue());
+        }
+        if (number instanceof Short) {
+            return ofShort(number.shortValue());
+        }
+        if (number instanceof Integer) {
+            return ofInteger(number.intValue());
+        }
+        if (number instanceof Long) {
+            return ofLong(number.longValue());
+        }
+        if (number instanceof Float) {
+            return ofFloat(number.floatValue());
+        }
+        return ofDouble(number.doubleValue());
+    }
+
     protected abstract String getSuffix();
 
     @Override
     public String toString() {
         return get() + getSuffix();
+    }
+
+    @Override
+    public JsonElement toJson() {
+        return new JsonPrimitive(get());
     }
 
     public static class NbtByte extends NbtNumber<ByteTag, Byte> {

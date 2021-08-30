@@ -1,6 +1,7 @@
 package top.frankyang.pre.api.block.color;
 
 import net.minecraft.block.MaterialColor;
+import top.frankyang.pre.api.math.RgbColor;
 import top.frankyang.pre.api.misc.DelegatedCastable;
 
 /**
@@ -41,27 +42,12 @@ public class Color extends DelegatedCastable<MaterialColor> implements ColorLike
     /**
      * 通过一个可解析为十六进制颜色的字符串构造颜色对象。
      *
-     * @param string 形如0x66ccff，#66ccff，或66ccff（大小写无关）的十六进制颜色字符串。
+     * @param string 十六进制颜色字符串。
      * @return 所构造的颜色对象。
      * @throws IllegalArgumentException 如果任一颜色值超出了[0, 255]的范围，或者字符串无法被解析为十六进制颜色。
      */
     public static Color of(String string) {
-        // Strip leading '0x' or '#'
-        if (string.startsWith("0x")) {
-            if (string.length() != 8) {
-                throw new IllegalArgumentException("Invalid hex color string: " + string);
-            }
-            string = string.substring(2, 8);
-        } else if (string.startsWith("#")) {
-            if (string.length() != 7) {
-                throw new IllegalArgumentException("Invalid hex color string: " + string);
-            }
-            string = string.substring(1, 7);
-        } else if (string.length() != 6) {
-            throw new IllegalArgumentException("Invalid hex color string: " + string);
-        }
-
-        return of(Integer.parseInt(string, 16));
+        return of(RgbColor.of(string).getRgb());
     }
 
     /**
@@ -77,14 +63,14 @@ public class Color extends DelegatedCastable<MaterialColor> implements ColorLike
         if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
             throw new IllegalArgumentException("Invalid color: must be in range [0, 255].");
         }
+
         return new Color(findNearest(r, g, b));
     }
 
     public static Color of(int rawColor) {
-        int r = (rawColor & 0xff0000) >> 16;
-        int g = (rawColor & 0x00ff00) >> 8;
-        int b = rawColor & 0x0000ff;
-
+        int r = rawColor >> 16;
+        int g = (rawColor & 0x00ffff) >> 8;
+        int b = rawColor & 0xff;
         return of(r, g, b);
     }
 }

@@ -1,23 +1,32 @@
 package top.frankyang.pre.api.nbt;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import net.minecraft.nbt.*;
-import top.frankyang.pre.api.misc.Castable;
-import top.frankyang.pre.api.misc.Copyable;
-import top.frankyang.pre.api.misc.DelegatedCastable;
-import top.frankyang.pre.api.misc.PrettyPrintable;
+import top.frankyang.pre.api.misc.*;
 import top.frankyang.pre.loader.exceptions.ImpossibleException;
+
+import java.util.Map;
 
 /**
  * 所有NBT数据的父类。
  *
  * @param <T> 该NBT所包装的原版NBT标签。
  */
-public abstract class Nbt<T extends Tag> extends DelegatedCastable<T> implements Castable<T>, PrettyPrintable, Copyable<Nbt<T>>, Cloneable {
+public abstract class Nbt<T extends Tag>
+    extends DelegatedCastable<T>
+    implements
+    Castable<T>,
+    PrettyPrintable,
+    Copyable<Nbt<T>>,
+    JsonCastable {
     /**
      * This static field is here to overcome compile-time type check. Without {@code (Class<?>)}, The compiler will consider the cast illegal, then refuse to compile. With {@code (Class<?>)}, we can fool the compiler :)
      */
     @SuppressWarnings({"unchecked", "RedundantCast"})
-    public static final Class<? extends Nbt<?>> CLASS = (Class<? extends Nbt<?>>) (Class<?>) Nbt.class;
+    protected static final Class<? extends Nbt<?>> CLASS = (Class<? extends Nbt<?>>) (Class<?>) Nbt.class;
 
     protected Nbt(T delegate) {
         super(delegate);
@@ -33,30 +42,69 @@ public abstract class Nbt<T extends Tag> extends DelegatedCastable<T> implements
         if (tag == null) return null;
         if (tag instanceof StringTag) {
             return NbtString.of((StringTag) tag);
-        } else if (tag instanceof ByteTag) {
+        }
+        if (tag instanceof ByteTag) {
             return NbtNumber.NbtByte.of((ByteTag) tag);
-        } else if (tag instanceof ShortTag) {
+        }
+        if (tag instanceof ShortTag) {
             return NbtNumber.NbtShort.of((ShortTag) tag);
-        } else if (tag instanceof IntTag) {
+        }
+        if (tag instanceof IntTag) {
             return NbtNumber.NbtInt.of((IntTag) tag);
-        } else if (tag instanceof LongTag) {
+        }
+        if (tag instanceof LongTag) {
             return NbtNumber.NbtLong.of((LongTag) tag);
-        } else if (tag instanceof FloatTag) {
+        }
+        if (tag instanceof FloatTag) {
             return NbtNumber.NbtFloat.of((FloatTag) tag);
-        } else if (tag instanceof DoubleTag) {
+        }
+        if (tag instanceof DoubleTag) {
             return NbtNumber.NbtDouble.of((DoubleTag) tag);
-        } else if (tag instanceof ByteArrayTag) {
+        }
+        if (tag instanceof ByteArrayTag) {
             return NbtArray.NbtByteArray.of((ByteArrayTag) tag);
-        } else if (tag instanceof IntArrayTag) {
+        }
+        if (tag instanceof IntArrayTag) {
             return NbtArray.NbtIntArray.of((IntArrayTag) tag);
-        } else if (tag instanceof LongArrayTag) {
+        }
+        if (tag instanceof LongArrayTag) {
             return NbtArray.NbtLongArray.of((LongArrayTag) tag);
-        } else if (tag instanceof ListTag) {
+        }
+        if (tag instanceof ListTag) {
             return NbtList.of((ListTag) tag);
-        } else if (tag instanceof CompoundTag) {
+        }
+        if (tag instanceof CompoundTag) {
             return NbtObject.of((CompoundTag) tag);
         }
         throw new ImpossibleException(tag.getClass().getName() + "?!");
+    }
+
+    public static Nbt<?> ofJson(JsonElement element) {
+        if (element instanceof JsonObject) {
+            NbtObject target = NbtObject.empty();
+            for (Map.Entry<String, JsonElement> entry : ((JsonObject) element).entrySet()) {
+                target.put(entry.getKey(), ofJson(entry.getValue()));
+            }
+            return target;
+        }
+        if (element instanceof JsonArray) {
+            NbtList target = NbtList.empty();
+            ((JsonArray) element).forEach(e -> target.add(ofJson(e)));
+            return target;
+        }
+        if (element instanceof JsonPrimitive) {
+            JsonPrimitive elem = (JsonPrimitive) element;
+            if (elem.isString()) {
+                return NbtString.of(elem.getAsString());
+            }
+            if (elem.isNumber()) {
+                return NbtNumber.of(elem.getAsNumber());
+            }
+            if (elem.isBoolean()) {
+                return NbtBoolean.of(elem.getAsBoolean());
+            }
+        }
+        throw new ImpossibleException(element.toString());
     }
 
     /**
@@ -68,20 +116,16 @@ public abstract class Nbt<T extends Tag> extends DelegatedCastable<T> implements
         return cast().getType();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Nbt<T> shallowCopy() {
+        Nbt<T> dst = Copyable.super.shallowCopy();
+        dst.delegate = (T) dst.delegate.copy();
+        return dst;
     }
 
-    @SuppressWarnings("unchecked")
-    public <U extends Nbt<T>> U copy() {
-        U u;
-        try {
-            u = (U) clone();
-        } catch (CloneNotSupportedException e) {
-            throw new ImpossibleException(e);
-        }
-        u.delegate = (T) u.delegate.copy();
-        return u;
+    @Override
+    public Nbt<T> deepCopy() {
+        return shallowCopy();  // Disables `deepCopy()` by default;
     }
 }

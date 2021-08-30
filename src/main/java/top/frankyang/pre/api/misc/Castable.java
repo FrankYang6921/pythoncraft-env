@@ -1,6 +1,5 @@
 package top.frankyang.pre.api.misc;
 
-import org.python.core.Py;
 import org.python.core.PyObject;
 
 /**
@@ -20,22 +19,20 @@ public interface Castable<T> {
      * @throws IllegalArgumentException 如果要转型的对象不能被转型为指定的类。
      */
     static <T> T infer(Object object, Class<T> clazz) {
-        if (!PyObject.class.isAssignableFrom(clazz) && object instanceof PyObject) {  // Not asking for a Python object
-            object = Py.tojava((PyObject) object, Object.class);
+        if (object instanceof PyObject && !PyObject.class.isAssignableFrom(clazz)) {  // Not asking for a Python object
+            object = ((PyObject) object).__tojava__(Object.class);
         }
 
         if (clazz.isInstance(object))
             return clazz.cast(object);
 
         if (object instanceof Castable<?>) {
-            Castable<?> castable = (Castable<?>) object;
-            final Object o, p;
-            if (clazz.isAssignableFrom(Castable.class) &&
-                clazz.isInstance(o = castable.cast())) {
-                return clazz.cast((Castable<?>) () -> o);
-            }
-            if (clazz.isInstance(p = castable.cast())) {
-                return clazz.cast(p);
+            Castable<?> c = (Castable<?>) object;
+            final Object o;
+            if (clazz.isAssignableFrom(Castable.class)) {
+                return clazz.cast(c);
+            } else if (clazz.isInstance(o = c.cast())) {
+                return clazz.cast(o);
             }
             throw new IllegalArgumentException(
                 "The object is castable, but not to an instance of the specified class."

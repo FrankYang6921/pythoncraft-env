@@ -3,7 +3,7 @@ package top.frankyang.pre.main;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.SemanticVersion;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
 import top.frankyang.pre.python.internal.PythonThreadPool;
@@ -23,8 +23,8 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 abstract class AbstractPythonCraft {
-    protected final Version version = Versions.of("0.1.1");
-    protected final PythonThreadPool pythonThreadPool = new PythonThreadPool();
+    protected final SemanticVersion version = Versions.ofNonNull("0.1.1");
+    protected final PythonThreadPool threadPool = new PythonThreadPool();
     private boolean looseMode = true;
 
     protected AbstractPythonCraft() {
@@ -52,19 +52,19 @@ abstract class AbstractPythonCraft {
     }
 
     private int maxPyThreadCountCmd(CommandContext<ServerCommandSource> context) {
-        pythonThreadPool.setMaxPythonCount(getInteger(context, "value"));
+        threadPool.setMaxPythonCount(getInteger(context, "value"));
         context.getSource().sendFeedback(new LiteralText("已经改变了最大Python解释器数量。"), true);
-        return pythonThreadPool.getMaxPythonCount();
+        return threadPool.getMaxPythonCount();
     }
 
     private int minPyThreadCountCmd(CommandContext<ServerCommandSource> context) {
-        pythonThreadPool.setMinPythonCount(getInteger(context, "value"));
+        threadPool.setMinPythonCount(getInteger(context, "value"));
         context.getSource().sendFeedback(new LiteralText("已经改变了最小Python解释器数量。"), true);
-        return pythonThreadPool.getMinPythonCount();
+        return threadPool.getMinPythonCount();
     }
 
     private int pyThreadTimeoutCmd(CommandContext<ServerCommandSource> context) {
-        pythonThreadPool.setKeepAliveTime(getLong(context, "value"), SECONDS);
+        threadPool.setKeepAliveTime(getLong(context, "value"), SECONDS);
         context.getSource().sendFeedback(new LiteralText("已经改变了Python解释器超时时间。"), true);
         return 1;
     }
@@ -82,17 +82,17 @@ abstract class AbstractPythonCraft {
 
     private int runScript(CommandContext<ServerCommandSource> context) {
         String path = getString(context, "path");
-        pythonThreadPool.submit(
+        threadPool.submit(
             p -> p.execfile(path), new StandaloneProvider(context, path)
         );
         return 1;
     }
 
-    public Version getVersion() {
+    public SemanticVersion getVersion() {
         return this.version;
     }
 
-    public PythonThreadPool getPythonThreadPool() {
-        return this.pythonThreadPool;
+    public PythonThreadPool getThreadPool() {
+        return this.threadPool;
     }
 }

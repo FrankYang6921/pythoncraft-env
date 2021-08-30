@@ -47,7 +47,7 @@ public class ItemSettings extends DelegatedCastable<FabricItemSettings> {
         return this;
     }
 
-    public ItemSettings recipeRemainder(Item recipeRemainder) {  // TODO 包装掉Item类
+    public ItemSettings recipeRemainder(Item recipeRemainder) {  // TODO wrap class `Item`
         delegate.recipeRemainder(recipeRemainder);
         return this;
     }

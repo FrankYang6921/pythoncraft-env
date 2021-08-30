@@ -1,14 +1,19 @@
 package top.frankyang.pre.api.misc;
 
+import top.frankyang.pre.api.util.CopyUtils;
+
 /**
  * 表明一个对象是可复制的。
  *
  * @param <T> 该对象的类型。
  */
-public interface Copyable<T> {
-    <U extends T> U copy();
+@SuppressWarnings("unchecked")
+public interface Copyable<T extends Copyable<T>> {
+    default T shallowCopy() {
+        return (T) CopyUtils.shallowCopy(this);
+    }
 
-    default <U extends T> U deepCopy() {
-        return copy();
+    default T deepCopy() {
+        return (T) CopyUtils.deepCopy(this);
     }
 }

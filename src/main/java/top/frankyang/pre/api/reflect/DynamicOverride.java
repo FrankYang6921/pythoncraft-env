@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.reflection;
+package top.frankyang.pre.api.reflect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,10 +1,11 @@
-package top.frankyang.pre.api.reflection.mapping;
+package top.frankyang.pre.api.reflect.mapping;
 
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.mapping.tree.ClassDef;
 import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
-import top.frankyang.pre.api.Minecraft;
+import top.frankyang.pre.api.util.GameUtils;
+import top.frankyang.pre.api.util.ReflectUtils;
 import top.frankyang.pre.loader.exceptions.RuntimeIOException;
 
 import java.io.BufferedReader;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SymbolResolver {
     static final String RUNTIME_NAMESPACE =
-        Minecraft.getFabricLoader().getMappingResolver().getCurrentRuntimeNamespace();
+        GameUtils.getFabricLoader().getMappingResolver().getCurrentRuntimeNamespace();
     static final String MAPPING_NAMESPACE = "named";
 
     private final Map<String, ClassMapping> runtimeToMapping = new HashMap<>();
@@ -166,22 +167,6 @@ public class SymbolResolver {
         return methodNameToMapping(clazz, runtimeField.getName());
     }
 
-    private Field findField(Class<?> clazz, String name) {
-        try {
-            return clazz.getDeclaredField(name);
-        } catch (ReflectiveOperationException e) {
-            // Search in parents
-            List<Field> results = new ArrayList<>();
-            for (Class<?> cls : clazz.getInterfaces()) {
-                results.add(findField(cls, name));
-            }
-            Class<?> cls = clazz.getSuperclass();
-            if (cls != null)
-                results.add(findField(cls, name));
-            return results.stream().filter(Objects::nonNull).findFirst().orElse(null);
-        }
-    }
-
     /**
      * @param clazz 指定的运行时类。
      * @param name  要查找的字段映射表名。
@@ -201,7 +186,7 @@ public class SymbolResolver {
     private Field runtimeField0(Class<?> clazz, String name) throws Throwable {
         // Development mode
         if (RUNTIME_NAMESPACE.equals("named"))
-            return findField(clazz, name);
+            return ReflectUtils.findField(clazz, name);
 
         Pair<Class<?>, String> pair = new Pair<>(clazz, name);
         if (runtimeFields.containsKey(pair)) {
@@ -252,7 +237,7 @@ public class SymbolResolver {
     private Method runtimeMethod0(Class<?> clazz, String name, Class<?>... paramTypes) throws Throwable {
         // Development mode
         if (RUNTIME_NAMESPACE.equals("named"))
-            return clazz.getMethod(name, paramTypes);
+            return ReflectUtils.findMethod(clazz, name, paramTypes);
 
         Pair<Class<?>, String> pair = new Pair<>(clazz, name);
         if (runtimeMethods.containsKey(pair)) {
@@ -268,7 +253,7 @@ public class SymbolResolver {
         String dst = mappingToRuntime.get(className).methodDst(name);
         if (dst != null) {
             runtimeMethods.put(pair, new Pair<>(clazz, dst));
-            return clazz.getMethod(dst, paramTypes);
+            return clazz.getDeclaredMethod(dst, paramTypes);
         }
 
         // Search in parents
