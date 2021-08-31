@@ -35,12 +35,12 @@ public class NbtString extends Nbt<StringTag> implements NbtPrimitive<String> {
 
     @Override
     public String get() {
-        return delegate.asString();
+        return casted.asString();
     }
 
     @Override
     public void set(String string) {
-        delegate = StringTag.of(string);
+        casted = StringTag.of(string);
     }
 
     @Override

@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * 包装类，包装原版类{@link ItemGroup}。
  */
-public class Group extends DelegatedCastable<ItemGroup> implements GroupLike {
+public class Group extends CastableImpl<ItemGroup> implements GroupLike {
     protected Group(ItemGroup delegate) {
         super(delegate);
     }

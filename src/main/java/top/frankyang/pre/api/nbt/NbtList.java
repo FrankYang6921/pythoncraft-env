@@ -47,7 +47,7 @@ public class NbtList extends Nbt<ListTag> implements NbtCollection<Tag, Nbt<?>> 
 
     @Override
     public List<Tag> getDelegateList() {
-        return delegate;
+        return casted;
     }
 
     @Override

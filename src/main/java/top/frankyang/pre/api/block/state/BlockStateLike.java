@@ -2,7 +2,8 @@ package top.frankyang.pre.api.block.state;
 
 import net.minecraft.block.BlockState;
 import top.frankyang.pre.api.block.type.BlockType;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
+import top.frankyang.pre.api.text.RichText;
 
 /**
  * 包装类接口。包装原版类{@link BlockState}。
@@ -103,4 +104,8 @@ public interface BlockStateLike extends Castable<BlockState> {
     }
 
     BlockType getBlockType();
+
+    default RichText getName() {
+        return getBlockType().getName();
+    }
 }

@@ -2,12 +2,12 @@ package top.frankyang.pre.api.item.food;
 
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.FoodComponent;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 /**
  * 包装类，包装原版类{@link FoodComponent}。
  */
-public class Food extends DelegatedCastable<FoodComponent> implements FoodLike {
+public class Food extends CastableImpl<FoodComponent> implements FoodLike {
     protected Food(FoodComponent delegate) {
         super(delegate);
     }

@@ -1,4 +1,4 @@
-package top.frankyang.pre.api.misc;
+package top.frankyang.pre.api.misc.collection;
 
 import java.lang.reflect.Array;
 import java.util.Collection;

@@ -2,9 +2,8 @@ package top.frankyang.pre.api.event;
 
 import top.frankyang.pre.main.PythonCraft;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 事件源。事件源允许您添加多个侦听器，并通过事件源触发某一事件。
@@ -12,7 +11,7 @@ import java.util.List;
  * @param <T> 要监听和触发的事件类型。
  */
 public class EventSource<T extends Event> {
-    private final List<EventListener<? super T>> eventListeners = new ArrayList<>();
+    private final List<EventListener<? super T>> eventListeners = new CopyOnWriteArrayList<>();
     private final String name;
 
     public EventSource(String name) {
@@ -44,31 +43,25 @@ public class EventSource<T extends Event> {
      * @return 成功触发的侦听器的数量。
      */
     public int trigger(T event) {
-        event.beforeListeners(this);
         int c = 0;
         for (EventListener<? super T> eventListener : eventListeners) {
             try {
                 eventListener.trigger(event);
-                c++;
             } catch (Throwable throwable) {
-                PythonCraft.getInstance().getLogger().error(
-                    "Failed to run event listener " + eventListener + " for event " +
-                        event.getType() + " in event source " + this + ": ", throwable
-                );
+                PythonCraft.getInstance().getLogger().error("Error in event source '" + name + "': ", throwable);
+                break;
+            } finally {
+                c++;
             }
         }
-        event.afterListeners(this);
         return c;
     }
 
-    public List<EventListener<? super T>> getEventListeners() {
-        return Collections.unmodifiableList(eventListeners);
+    public int getListenerCount() {
+        return eventListeners.size();
     }
 
-    @Override
-    public String toString() {
-        return "EventSource{" +
-            "name='" + name + '\'' +
-            '}';
+    public String getName() {
+        return name;
     }
 }

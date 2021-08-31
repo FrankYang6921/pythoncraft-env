@@ -1,7 +1,7 @@
 package top.frankyang.pre.api.block.color;
 
 import net.minecraft.block.MaterialColor;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 
 /**
  * 包装类接口，包装原版类{@link MaterialColor}。

@@ -6,12 +6,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 /**
  * 包装类，包装原版类{@link BlockSoundGroup}。
  */
-public class BlockSounds extends DelegatedCastable<BlockSoundGroup> {
+public class BlockSounds extends CastableImpl<BlockSoundGroup> {
     protected BlockSounds(BlockSoundGroup delegate) {
         super(delegate);
     }
@@ -35,31 +35,31 @@ public class BlockSounds extends DelegatedCastable<BlockSoundGroup> {
     }
 
     public float getVolume() {
-        return delegate.getVolume();
+        return casted.getVolume();
     }
 
     public float getPitch() {
-        return delegate.getPitch();
+        return casted.getPitch();
     }
 
     public String getBreakSoundId() {
-        return delegate.getBreakSound().getId().toString();
+        return casted.getBreakSound().getId().toString();
     }
 
     public String getStepSoundId() {
-        return delegate.getStepSound().getId().toString();
+        return casted.getStepSound().getId().toString();
     }
 
     public String getPlaceSoundId() {
-        return delegate.getPlaceSound().getId().toString();
+        return casted.getPlaceSound().getId().toString();
     }
 
     public String getHitSoundId() {
-        return delegate.getHitSound().getId().toString();
+        return casted.getHitSound().getId().toString();
     }
 
     public String getFallSound() {
-        return delegate.getFallSound().getId().toString();
+        return casted.getFallSound().getId().toString();
     }
 
     public static class Builder {

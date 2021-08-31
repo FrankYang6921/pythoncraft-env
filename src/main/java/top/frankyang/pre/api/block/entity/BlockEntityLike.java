@@ -3,7 +3,7 @@ package top.frankyang.pre.api.block.entity;
 import net.minecraft.block.entity.BlockEntity;
 import top.frankyang.pre.api.block.BlockPosition;
 import top.frankyang.pre.api.block.state.BlockStateLike;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 import top.frankyang.pre.api.nbt.NbtObject;
 import top.frankyang.pre.api.world.WorldLike;
 import top.frankyang.pre.api.world.WorldImpl;

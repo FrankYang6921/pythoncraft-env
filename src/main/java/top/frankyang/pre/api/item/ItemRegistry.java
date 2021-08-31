@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import top.frankyang.pre.api.AbstractRegistry;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.item.type.ItemType;
 
 /**
  * 物品注册表。在某一个PythonCraft包的命名空间内注册物品。
@@ -21,7 +21,7 @@ public final class ItemRegistry extends AbstractRegistry {
      * @param id 所查询物品的完整命名空间ID。
      * @return 查询到的物品。
      */
-    public static Item lookup(Identifier id) {
+    static Item lookup(Identifier id) {
         Item item = Registry.ITEM.get(id);
         if (item == Items.AIR)
             throw new IllegalArgumentException("Cannot find the item for the identifier: " + id);
@@ -34,8 +34,8 @@ public final class ItemRegistry extends AbstractRegistry {
      * @param id   所注册物品的命名空间ID。
      * @param item 所要注册的物品实例。
      */
-    public synchronized void registerItem(String id, Object item) {  // TODO wrap class `Item`
-        Registry.register(Registry.ITEM, getIdentifier(id), Castable.infer(item, Item.class));
+    public void registerItem(String id, ItemType item) {  // TODO wrap class `Item`
+        Registry.register(Registry.ITEM, getIdentifier(id), item.cast());
     }
 
     /**
@@ -44,7 +44,7 @@ public final class ItemRegistry extends AbstractRegistry {
      * @param id           所注册物品的命名空间ID。
      * @param itemSettings 所要注册的物品设置（Python字典，会自动解析设置并创建物品实例）。
      */
-    public synchronized void registerItem(String id, ItemSettings itemSettings) {
+    public void registerItem(String id, ItemSettings itemSettings) {
         Registry.register(Registry.ITEM, getIdentifier(id), new Item(itemSettings.cast()));
     }
 

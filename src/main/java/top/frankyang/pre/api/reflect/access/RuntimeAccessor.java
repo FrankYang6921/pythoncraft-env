@@ -1,7 +1,7 @@
-package top.frankyang.pre.api.reflect;
+package top.frankyang.pre.api.reflect.access;
 
 import org.jetbrains.annotations.Nullable;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 import top.frankyang.pre.api.reflect.mapping.SymbolResolver;
 
 import java.lang.reflect.Field;
@@ -15,7 +15,7 @@ import java.util.Objects;
  * @param <T> 要访问的类。
  */
 @FunctionalInterface
-public interface RuntimeAccessor<T> extends Castable<T> {
+public interface RuntimeAccessor<T> extends Castable<T>, Accessor<T> {
     /**
      * @param clazz 要访问的类对象。
      * @param <T>   要访问的类。
@@ -32,11 +32,11 @@ public interface RuntimeAccessor<T> extends Castable<T> {
      */
     static <T> RuntimeAccessor<T> of(T object) {
         //noinspection unchecked
-        Class<? extends T> clazz = (Class<? extends T>) object.getClass();
+        Class<T> clazz = (Class<T>) object.getClass();
 
         return new RuntimeAccessor<T>() {
             @Override
-            public Class<? extends T> getClazz() {
+            public Class<T> getClazz() {
                 return clazz;
             }
 
@@ -64,14 +64,8 @@ public interface RuntimeAccessor<T> extends Castable<T> {
             getTarget(), "Cannot convert to a target object from a static-only runtime accessor!");
     }
 
-    /**
-     * 获取一个字段。
-     *
-     * @param name 字段名。
-     * @param <U>  语法糖性质的类型参数。允许隐式转型到任意一个类型。
-     * @return 获取到的字段。
-     */
-    default <U> U get(String name) {
+    @Override
+    default <U> U getField(String name) {
         if (getTarget() == null) {
             throw new IllegalStateException(
                 "Cannot access instance field '" + name + "' from this static-only runtime accessor!");
@@ -85,13 +79,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
         }
     }
 
-    /**
-     * 获取一个静态字段。
-     *
-     * @param name 字段名。
-     * @param <U>  语法糖性质的类型参数。允许隐式转型到任意一个类型。
-     * @return 获取到的静态字段。
-     */
+    @Override
     default <U> U getStatic(String name) {
         Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         if (!Modifier.isStatic(field.getModifiers())) {
@@ -106,13 +94,8 @@ public interface RuntimeAccessor<T> extends Castable<T> {
         }
     }
 
-    /**
-     * 写入一个字段。
-     *
-     * @param name  字段名。
-     * @param value 字段值。
-     */
-    default void set(String name, Object value) {
+    @Override
+    default void setField(String name, Object value) {
         if (getTarget() == null) {
             throw new IllegalStateException(
                 "Cannot access instance field '" + name + "' from this static-only runtime accessor!");
@@ -125,12 +108,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
         }
     }
 
-    /**
-     * 写入一个静态字段。
-     *
-     * @param name  字段名。
-     * @param value 字段值。
-     */
+    @Override
     default void setStatic(String name, Object value) {
         Field field = SymbolResolver.getInstance().runtimeField(getClazz(), name);
         if (!Modifier.isStatic(field.getModifiers())) {
@@ -144,15 +122,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
         }
     }
 
-    /**
-     * 调用一个方法。
-     *
-     * @param name  方法名。
-     * @param types 方法形参类型数组。
-     * @param args  方法实参数组。
-     * @param <U>   语法糖性质的类型参数。允许隐式转型到任意一个类型。
-     * @return 方法的返回值。
-     */
+    @Override
     default <U> U invoke(String name, Class<?>[] types, Object[] args) {
         if (getTarget() == null) {
             throw new IllegalStateException(
@@ -167,39 +137,7 @@ public interface RuntimeAccessor<T> extends Castable<T> {
         }
     }
 
-    /**
-     * 调用一个方法。
-     *
-     * @param name 方法名。
-     * @param type 方法形参类型。
-     * @param arg  方法实参。
-     * @param <U>  语法糖性质的类型参数。允许隐式转型到任意一个类型。
-     * @return 方法的返回值。
-     */
-    default <U> U invoke(String name, Class<?> type, Object arg) {
-        return invoke(name, new Class[]{type}, new Object[]{arg});
-    }
-
-    /**
-     * 调用一个方法。
-     *
-     * @param name 方法名。
-     * @param <U>  语法糖性质的类型参数。允许隐式转型到任意一个类型。
-     * @return 方法的返回值。
-     */
-    default <U> U invoke(String name) {
-        return invoke(name, new Class[0], new Object[0]);
-    }
-
-    /**
-     * 调用一个静态方法。
-     *
-     * @param name  方法名。
-     * @param types 方法形参类型数组。
-     * @param args  方法实参数组。
-     * @param <U>   语法糖性质的类型参数。允许隐式转型到任意一个类型。
-     * @return 方法的返回值。
-     */
+    @Override
     default <U> U invokeStatic(String name, Class<?>[] types, Object[] args) {
         Method method = SymbolResolver.getInstance().runtimeMethod(getClazz(), name, types);
         if (!Modifier.isStatic(method.getModifiers())) {

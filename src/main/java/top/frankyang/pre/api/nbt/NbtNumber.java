@@ -104,12 +104,12 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> e
 
         @Override
         public Byte get() {
-            return delegate.getByte();
+            return casted.getByte();
         }
 
         @Override
         public void set(Byte aByte) {
-            delegate = ByteTag.of(aByte);
+            casted = ByteTag.of(aByte);
         }
     }
 
@@ -129,12 +129,12 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> e
 
         @Override
         public Short get() {
-            return delegate.getShort();
+            return casted.getShort();
         }
 
         @Override
         public void set(Short aShort) {
-            delegate = ShortTag.of(aShort);
+            casted = ShortTag.of(aShort);
         }
     }
 
@@ -154,12 +154,12 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> e
 
         @Override
         public Integer get() {
-            return delegate.getInt();
+            return casted.getInt();
         }
 
         @Override
         public void set(Integer aInt) {
-            delegate = IntTag.of(aInt);
+            casted = IntTag.of(aInt);
         }
     }
 
@@ -179,12 +179,12 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> e
 
         @Override
         public Long get() {
-            return delegate.getLong();
+            return casted.getLong();
         }
 
         @Override
         public void set(Long aLong) {
-            delegate = LongTag.of(aLong);
+            casted = LongTag.of(aLong);
         }
     }
 
@@ -204,12 +204,12 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> e
 
         @Override
         public Float get() {
-            return delegate.getFloat();
+            return casted.getFloat();
         }
 
         @Override
         public void set(Float aFloat) {
-            delegate = FloatTag.of(aFloat);
+            casted = FloatTag.of(aFloat);
         }
     }
 
@@ -229,12 +229,12 @@ public abstract class NbtNumber<T extends AbstractNumberTag, U extends Number> e
 
         @Override
         public Double get() {
-            return delegate.getDouble();
+            return casted.getDouble();
         }
 
         @Override
         public void set(Double aDouble) {
-            delegate = DoubleTag.of(aDouble);
+            casted = DoubleTag.of(aDouble);
         }
     }
 }

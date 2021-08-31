@@ -29,12 +29,12 @@ public class MutableBlockState extends ImmutableBlockState {
             throw new ClassCastException(value + "?");
         }
         // Flag 3 is the default behaviour as seen in the implementation of `net.minecraft.world.World`.
-        access.setBlockState(position, delegate = delegate.with((Property<T>) property, value), 3);
+        access.setBlockState(position, casted = casted.with((Property<T>) property, value), 3);
         return this;
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return casted.toString();
     }
 }

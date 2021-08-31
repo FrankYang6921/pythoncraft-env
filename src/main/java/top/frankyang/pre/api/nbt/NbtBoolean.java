@@ -34,16 +34,21 @@ public class NbtBoolean extends Nbt<ByteTag> implements NbtPrimitive<Boolean> {
 
     @Override
     public Boolean get() {
-        return delegate.getByte() > 0;
+        return casted.getByte() > 0;
     }
 
     @Override
     public void set(Boolean aBoolean) {
-        delegate = ByteTag.of((byte) (aBoolean ? 1 : 0));
+        casted = ByteTag.of((byte) (aBoolean ? 1 : 0));
     }
 
     @Override
     public JsonElement toJson() {
         return new JsonPrimitive(get());
+    }
+
+    @Override
+    public String toString() {
+        return casted.toString();
     }
 }

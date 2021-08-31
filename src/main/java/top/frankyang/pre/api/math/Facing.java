@@ -1,7 +1,7 @@
 package top.frankyang.pre.api.math;
 
 import net.minecraft.util.math.Direction;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 import top.frankyang.pre.loader.exceptions.ImpossibleException;
 
 /**

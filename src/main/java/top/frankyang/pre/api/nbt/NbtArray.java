@@ -81,7 +81,7 @@ public abstract class NbtArray<T extends Tag, U extends Nbt<T>>
 
     @Override
     public List<T> getDelegateList() {
-        return delegate;
+        return casted;
     }
 
     @Override

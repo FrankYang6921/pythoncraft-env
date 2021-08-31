@@ -29,14 +29,16 @@ import top.frankyang.pre.api.block.state.BlockStateFactory;
 import top.frankyang.pre.api.block.state.MutableBlockState;
 import top.frankyang.pre.api.entity.EntityImpl;
 import top.frankyang.pre.api.entity.PlayerImpl;
-import top.frankyang.pre.api.event.EventSources;
-import top.frankyang.pre.api.event.EventSourcesImpl;
+import top.frankyang.pre.api.event.EventBus;
+import top.frankyang.pre.api.event.EventBusImpl;
 import top.frankyang.pre.api.event.EventType;
-import top.frankyang.pre.api.event.ExposedEventSources;
+import top.frankyang.pre.api.event.ExposedEventBus;
 import top.frankyang.pre.api.math.Facing;
 import top.frankyang.pre.api.reflect.DynamicOverride;
 import top.frankyang.pre.api.reflect.DynamicOverrider;
 import top.frankyang.pre.api.reflect.MethodContainer;
+import top.frankyang.pre.api.text.RichText;
+import top.frankyang.pre.api.text.RichTextImpl;
 import top.frankyang.pre.api.util.ArrayUtils;
 import top.frankyang.pre.api.world.WorldImpl;
 
@@ -44,9 +46,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class BlockType extends DynamicOverrider<Block> implements ExposedEventSources<BlockEvent> {
+public class BlockType extends DynamicOverrider<Block> implements ExposedEventBus<BlockEvent> {
     private static final Map<Block, BlockType> map = new HashMap<>();
-    private final EventSources<BlockEvent> eventSources = new EventSourcesImpl<>(
+    private final EventBus<BlockEvent> eventBus = new EventBusImpl<>(
         "onBreakageStart",          // onBreak
         "onBreakageFinish",         // onBroken
         "afterBreakage",            // afterBreak
@@ -56,8 +58,8 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
         "onPlacement",              // onPlaced
         "onUsage"                   // onUse
     );
-    private final BlockStateFactory blockStateFactory;
-    private final BlockEntityFactory blockEntityFactory;
+    private BlockStateFactory blockStateFactory;
+    private BlockEntityFactory blockEntityFactory;
 
     public BlockType(BlockSettings settings) {
         this(settings, null, null);
@@ -70,27 +72,39 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
     public BlockType(BlockSettings settings,
                      BlockStateFactory blockStateFactory,
                      BlockEntityFactory blockEntityFactory) {
-        this(settings, blockStateFactory, blockEntityFactory, new Class<?>[0]);
+        this(settings, blockStateFactory, blockEntityFactory, Block.class);
     }
 
     public BlockType(BlockSettings settings,
                      BlockStateFactory blockStateFactory,
                      BlockEntityFactory blockEntityFactory,
+                     Class<? extends Block> targetClass) {
+        this(settings, blockStateFactory, blockEntityFactory, targetClass, new Class<?>[0]);
+    }
+
+    public BlockType(BlockSettings settings,
+                     BlockStateFactory blockStateFactory,
+                     BlockEntityFactory blockEntityFactory,
+                     Class<? extends Block> targetClass,
                      Class<?>... interfaces) {
-        super(Block.class,
+        super(targetClass,
             blockEntityFactory != null ?
                 ArrayUtils.mergeArrays(Class.class, interfaces, BlockEntityProvider.class) : interfaces
         );
         this.blockStateFactory = blockStateFactory;
         this.blockEntityFactory = blockEntityFactory;
 
-        superConstructor(new Class[]{AbstractBlock.Settings.class}, settings.cast());
+        superConstructor(new Class<?>[]{AbstractBlock.Settings.class}, settings.cast());
 
         if (blockEntityFactory != null) {
             blockEntityFactory.newType(this);
         }
 
         map.put(cast(), this);
+    }
+
+    protected BlockType(Class<? extends Block> targetClass, Class<?>... interfaces) {
+        super(targetClass, interfaces);
     }
 
     public static BlockType ofVanilla(Block block) {
@@ -112,6 +126,10 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
             );
         }
         return getTarget();
+    }
+
+    public RichText getName() {
+        return new RichTextImpl(cast().getName());
     }
 
     @DynamicOverride
@@ -210,9 +228,7 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
     @DynamicOverride
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, MethodContainer superMethod) {
         ActionResult superResult = superMethod.invoke(state, world, pos, player, hand, hit);
-        if (superResult != ActionResult.PASS) {
-            return superResult;
-        }
+
         if (!world.isClient()) {
             trigger("onUsage", new BlockUsageEvent(
                 this,
@@ -225,7 +241,10 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
             ));
         }
 
-        return getBackingMap().get("onUsage").getEventListeners().size() != 0 ? ActionResult.SUCCESS : ActionResult.PASS;
+        if (superResult != ActionResult.PASS) {
+            return superResult;
+        }
+        return getSource("onUsage").getListenerCount() == 0 ? ActionResult.PASS : ActionResult.SUCCESS;
     }
 
     @DynamicOverride
@@ -243,7 +262,7 @@ public class BlockType extends DynamicOverrider<Block> implements ExposedEventSo
     }
 
     @Override
-    public EventSources<BlockEvent> getDelegateEventSources() {
-        return eventSources;
+    public EventBus<BlockEvent> getDelegateEventSources() {
+        return eventBus;
     }
 }

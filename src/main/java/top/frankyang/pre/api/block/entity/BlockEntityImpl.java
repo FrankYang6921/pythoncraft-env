@@ -5,16 +5,16 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import top.frankyang.pre.api.block.state.BlockStateLike;
 import top.frankyang.pre.api.block.state.MutableBlockState;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 import top.frankyang.pre.api.nbt.NbtObject;
 
-public abstract class BlockEntityImpl extends DelegatedCastable<BlockEntity> implements BlockEntityLike {
+public abstract class BlockEntityImpl extends CastableImpl<BlockEntity> implements BlockEntityLike {
     private final BlockEntityFactory factory;
     private BlockStateLike state;
 
     protected BlockEntityImpl(BlockEntityFactory factory) {
         this.factory = factory;
-        delegate = new MyBlockEntity(factory);
+        casted = new MyBlockEntity(factory);
     }
 
     public BlockStateLike getState() {

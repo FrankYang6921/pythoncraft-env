@@ -8,7 +8,7 @@ import top.frankyang.pre.api.block.entity.BlockEntityLike;
 import top.frankyang.pre.api.block.entity.VanillaBlockEntityImpl;
 import top.frankyang.pre.api.block.state.BlockStateLike;
 import top.frankyang.pre.api.block.state.MutableBlockState;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 
 public interface WorldLike extends Castable<WorldAccess> {
     default int lightLevelAt(BlockPosition position) {

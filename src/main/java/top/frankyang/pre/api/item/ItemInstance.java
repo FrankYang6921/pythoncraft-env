@@ -1,25 +1,32 @@
 package top.frankyang.pre.api.item;
 
 import net.minecraft.item.ItemStack;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.item.type.ItemType;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 import top.frankyang.pre.api.nbt.NbtObject;
 import top.frankyang.pre.api.text.RichTextImpl;
 
-public class ItemInstance extends DelegatedCastable<ItemStack> {
+public class ItemInstance extends CastableImpl<ItemStack> {
     public ItemInstance(ItemStack delegate) {
         super(delegate);
     }  // TODO wrap enchantments
 
     public RichTextImpl getName() {
-        return new RichTextImpl(delegate.getName());
+        return new RichTextImpl(casted.getName());
+    }
+
+    public ItemType getItemType() {
+        if (ItemType.isPythonCraft(casted.getItem()))
+            return ItemType.ofVanilla(casted.getItem());
+        throw new UnsupportedOperationException();  // TODO make a simple wrapper
     }
 
     public int getCoolDownTime() {
-        return delegate.getCooldown();
+        return casted.getCooldown();
     }
 
     public void setCoolDownTime(int value) {
-        delegate.setCooldown(value);
+        casted.setCooldown(value);
     }
 
     public void supply(int value) {
@@ -34,7 +41,7 @@ public class ItemInstance extends DelegatedCastable<ItemStack> {
         if (!force && getCount() + 1 > getMaxCount()) {
             throw new IllegalStateException("Too many items: " + (getCount() + 1) + " > " + getMaxCount() + ".");
         }
-        delegate.increment(value);
+        casted.increment(value);
     }
 
     public void consume(int value) {
@@ -49,11 +56,11 @@ public class ItemInstance extends DelegatedCastable<ItemStack> {
         if (!force && getCount() - 1 <= 0) {
             throw new IllegalStateException("Too few items: " + (getCount() + 1) + " (must be positive) <= 0.");
         }
-        delegate.decrement(value);
+        casted.decrement(value);
     }
 
     public int getCount() {
-        return delegate.getCount();
+        return casted.getCount();
     }
 
     public void setCount(int value) {
@@ -67,43 +74,43 @@ public class ItemInstance extends DelegatedCastable<ItemStack> {
         if (!force && value <= 0) {
             throw new IllegalStateException("Too few items: " + value + " (must be positive) <= 0.");
         }
-        delegate.setCount(value);
+        casted.setCount(value);
     }
 
     public int getMaxCount() {
-        return delegate.getMaxCount();
+        return casted.getMaxCount();
     }
 
     public boolean isFood() {
-        return delegate.getItem().isFood();
+        return casted.getItem().isFood();
     }
 
     public String getDrinkSoundId() {
-        return delegate.getItem().getDrinkSound().getId().toString();
+        return casted.getItem().getDrinkSound().getId().toString();
     }
 
     public String getEatSoundId() {
-        return delegate.getItem().getEatSound().getId().toString();
+        return casted.getItem().getEatSound().getId().toString();
     }
 
     public int getRepairCost() {
-        return delegate.getMaxUseTime();
+        return casted.getMaxUseTime();
     }
 
     public void setRepairCost(int value) {
-        delegate.setRepairCost(value);
+        casted.setRepairCost(value);
     }
 
     public int getDamage() {
-        return delegate.getDamage();
+        return casted.getDamage();
     }
 
     public void setDamage(int value) {
-        delegate.setDamage(value);
+        casted.setDamage(value);
     }
 
     public int getMaxDamage() {
-        return delegate.getMaxDamage();
+        return casted.getMaxDamage();
     }
 
     public boolean isDamageable() {
@@ -115,6 +122,6 @@ public class ItemInstance extends DelegatedCastable<ItemStack> {
     }
 
     public NbtObject getNbt() {
-        return NbtObject.of(delegate.getOrCreateTag());
+        return NbtObject.of(casted.getOrCreateTag());
     }
 }

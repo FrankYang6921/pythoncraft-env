@@ -6,12 +6,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.MaterialColor;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 /**
  * 包装类，包装原版类{@link AbstractBlock.Settings}。
  */
-public class BlockSettings extends DelegatedCastable<FabricBlockSettings> {
+public class BlockSettings extends CastableImpl<FabricBlockSettings> {
     protected BlockSettings(FabricBlockSettings delegate) {
         super(delegate);
     }
@@ -35,127 +35,127 @@ public class BlockSettings extends DelegatedCastable<FabricBlockSettings> {
     }
 
     public BlockSettings noCollision() {
-        delegate.noCollision();
+        casted.noCollision();
         return this;
     }
 
     public BlockSettings nonOpaque() {
-        delegate.nonOpaque();
+        casted.nonOpaque();
         return this;
     }
 
     public BlockSettings slipperiness(float value) {
-        delegate.slipperiness(value);
+        casted.slipperiness(value);
         return this;
     }
 
     public BlockSettings velocityMultiplier(float velocityMultiplier) {
-        delegate.velocityMultiplier(velocityMultiplier);
+        casted.velocityMultiplier(velocityMultiplier);
         return this;
     }
 
     public BlockSettings jumpVelocityMultiplier(float jumpVelocityMultiplier) {
-        delegate.jumpVelocityMultiplier(jumpVelocityMultiplier);
+        casted.jumpVelocityMultiplier(jumpVelocityMultiplier);
         return this;
     }
 
     public BlockSettings sounds(BlockSounds sounds) {
-        delegate.sounds(sounds.cast());
+        casted.sounds(sounds.cast());
         return this;
     }
 
     public BlockSettings sounds(BlockSounds.Builder builder) {
-        delegate.sounds(builder.build().cast());
+        casted.sounds(builder.build().cast());
         return this;
     }
 
     public BlockSettings strength(float hardness, float resistance) {
-        delegate.strength(hardness, resistance);
+        casted.strength(hardness, resistance);
         return this;
     }
 
     public BlockSettings breakInstantly() {
-        delegate.breakInstantly();
+        casted.breakInstantly();
         return this;
     }
 
     public BlockSettings strength(float strength) {
-        delegate.strength(strength);
+        casted.strength(strength);
         return this;
     }
 
     public BlockSettings ticksRandomly() {
-        delegate.ticksRandomly();
+        casted.ticksRandomly();
         return this;
     }
 
     public BlockSettings dynamicBounds() {
-        delegate.dynamicBounds();
+        casted.dynamicBounds();
         return this;
     }
 
     public BlockSettings dropsNothing() {
-        delegate.dropsNothing();
+        casted.dropsNothing();
         return this;
     }
 
     public BlockSettings dropsLike(Block block) {
-        delegate.dropsLike(block);
+        casted.dropsLike(block);
         return this;
     }
 
     public BlockSettings air() {
-        delegate.air();
+        casted.air();
         return this;
     }
 
     public BlockSettings lightLevel(int lightLevel) {
-        delegate.lightLevel(lightLevel);
+        casted.lightLevel(lightLevel);
         return this;
     }
 
     public BlockSettings luminance(int luminance) {
-        delegate.luminance(luminance);
+        casted.luminance(luminance);
         return this;
     }
 
     public BlockSettings hardness(float hardness) {
-        delegate.hardness(hardness);
+        casted.hardness(hardness);
         return this;
     }
 
     public BlockSettings resistance(float resistance) {
-        delegate.resistance(resistance);
+        casted.resistance(resistance);
         return this;
     }
 
     public BlockSettings drops(Identifier dropTableId) {
-        delegate.drops(dropTableId);
+        casted.drops(dropTableId);
         return this;
     }
 
     public BlockSettings requiresTool() {
-        delegate.requiresTool();
+        casted.requiresTool();
         return this;
     }
 
     public BlockSettings materialColor(MaterialColor color) {
-        delegate.materialColor(color);
+        casted.materialColor(color);
         return this;
     }
 
     public BlockSettings materialColor(DyeColor color) {
-        delegate.materialColor(color);
+        casted.materialColor(color);
         return this;
     }
 
     public BlockSettings collidable(boolean collidable) {
-        delegate.collidable(collidable);
+        casted.collidable(collidable);
         return this;
     }
 
     public BlockSettings breakByHand(boolean breakByHand) {
-        delegate.breakByHand(breakByHand);
+        casted.breakByHand(breakByHand);
         return this;
     }
 }

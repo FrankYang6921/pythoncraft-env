@@ -5,7 +5,8 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.jetbrains.annotations.NotNull;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
+import top.frankyang.pre.api.reflect.access.RuntimeAccessor;
 import top.frankyang.pre.api.reflect.mapping.SymbolResolver;
 import top.frankyang.pre.api.util.ArrayUtils;
 
@@ -141,7 +142,7 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
             return source.getReturnType().isAssignableFrom(override.getReturnType());
         }
         if (srcTypes2.length == dstTypes.length) {
-            for (int i = 0; i < srcTypes1.length; i++) {
+            for (int i = 0; i < srcTypes2.length; i++) {
                 if (!dstTypes[i].isAssignableFrom(srcTypes2[i])) return false;
             }
             return source.getReturnType().isAssignableFrom(override.getReturnType());
@@ -237,10 +238,7 @@ public abstract class DynamicOverrider<T> extends Enhancer implements RuntimeAcc
             if (o == null || getClass() != o.getClass()) return false;
             MethodWrapper that = (MethodWrapper) o;
             return this.method.getName().equals(that.method.getName()) &&
-                Arrays.equals(
-                    this.method.getParameterTypes(),
-                    that.method.getParameterTypes()
-                );
+                Arrays.equals(this.method.getParameterTypes(), that.method.getParameterTypes());
         }
 
         @Override

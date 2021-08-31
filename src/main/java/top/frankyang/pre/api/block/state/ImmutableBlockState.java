@@ -3,16 +3,15 @@ package top.frankyang.pre.api.block.state;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Property;
 import top.frankyang.pre.api.block.type.BlockType;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 包装类。包装原版类{@link BlockState}。该类是不可变的。
  */
-public class ImmutableBlockState extends DelegatedCastable<BlockState> implements BlockStateLike {
+public class ImmutableBlockState extends CastableImpl<BlockState> implements BlockStateLike {
     protected final Map<String, Property<?>> properties = new HashMap<>();
 
     public ImmutableBlockState(BlockState delegate) {
@@ -23,11 +22,13 @@ public class ImmutableBlockState extends DelegatedCastable<BlockState> implement
     }
 
     public Comparable<?> getProperty(String key) {
-        return delegate.get(properties.get(key));
+        return casted.get(properties.get(key));
     }
 
     @Override
     public BlockType getBlockType() {
-        return BlockType.ofVanilla(delegate.getBlock());
+        if (BlockType.isPythonCraft(casted.getBlock()))
+            return BlockType.ofVanilla(casted.getBlock());
+        throw new UnsupportedOperationException();  // TODO make a simple wrapper
     }
 }

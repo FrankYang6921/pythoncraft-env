@@ -2,12 +2,12 @@ package top.frankyang.pre.api.block;
 
 import net.minecraft.util.math.BlockPos;
 import top.frankyang.pre.api.math.Vector3;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 /**
  * 包装类，包装原版类{@link BlockPos}。
  */
-public class BlockPosition extends DelegatedCastable<BlockPos> implements Vector3<Integer> {
+public class BlockPosition extends CastableImpl<BlockPos> implements Vector3<Integer> {
     public BlockPosition(BlockPos delegate) {
         super(delegate);
     }
@@ -18,17 +18,17 @@ public class BlockPosition extends DelegatedCastable<BlockPos> implements Vector
 
     @Override
     public Integer getX() {
-        return delegate.getX();
+        return casted.getX();
     }
 
     @Override
     public Integer getY() {
-        return delegate.getY();
+        return casted.getY();
     }
 
     @Override
     public Integer getZ() {
-        return delegate.getZ();
+        return casted.getZ();
     }
 
     @Override

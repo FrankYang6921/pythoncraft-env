@@ -1,9 +1,9 @@
 package top.frankyang.pre.api.math;
 
 import net.minecraft.util.math.Vec3d;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
-public class Vector3d extends DelegatedCastable<Vec3d> implements Vector3<Double> {
+public class Vector3d extends CastableImpl<Vec3d> implements Vector3<Double> {
     public Vector3d(Vec3d delegate) {
         super(delegate);
     }
@@ -13,14 +13,14 @@ public class Vector3d extends DelegatedCastable<Vec3d> implements Vector3<Double
     }
 
     public Double getX() {
-        return delegate.getX();
+        return casted.getX();
     }
 
     public Double getY() {
-        return delegate.getY();
+        return casted.getY();
     }
 
     public Double getZ() {
-        return delegate.getZ();
+        return casted.getZ();
     }
 }

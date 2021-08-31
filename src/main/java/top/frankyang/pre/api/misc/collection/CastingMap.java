@@ -1,6 +1,7 @@
-package top.frankyang.pre.api.misc;
+package top.frankyang.pre.api.misc.collection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,23 +71,28 @@ public interface CastingMap<K, S, D> extends Map<K, D> {
 
     @Override
     default Set<K> keySet() {
-        return getDelegateMap().keySet();
+        return Collections.unmodifiableSet(getDelegateMap().keySet());
     }
 
     @Override
     default Collection<D> values() {
-        return getDelegateMap().values().stream().map(this::toDst).collect(Collectors.toList());
+        return Collections.unmodifiableCollection(
+            getDelegateMap().values().stream().map(this::toDst).collect(Collectors.toList())
+        );
     }
 
     @Override
     default Set<Entry<K, D>> entrySet() {
-        return keySet().stream().map(k -> new CastingEntry<>(this, k)).collect(Collectors.toSet());
+        return Collections.unmodifiableSet(
+            keySet().stream()
+                .map(k -> new CastingEntry<>(this, k)).collect(Collectors.toSet())
+        );
     }
 
     final class CastingEntry<K, S, D> implements Entry<K, D> {
         private final CastingMap<K, S, D> map;
         private final K key;
-        private volatile D value;
+        private D value;
 
         private CastingEntry(CastingMap<K, S, D> map, K key) {
             this.map = map;

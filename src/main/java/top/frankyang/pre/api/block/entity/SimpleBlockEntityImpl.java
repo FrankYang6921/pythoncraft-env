@@ -7,22 +7,22 @@ import top.frankyang.pre.api.nbt.NbtObject;
  * 简单的方块实体。它持有一个NBT表，您可以自由使用这个NBT表。
  */
 class SimpleBlockEntityImpl extends BlockEntityImpl {
-    private final NbtObject data;
+    private final NbtObject nbt;
 
-    protected SimpleBlockEntityImpl(SimpleBlockEntityFactory factory, NbtObject data) {
+    protected SimpleBlockEntityImpl(SimpleBlockEntityFactory factory, NbtObject nbt) {
         super(factory);
-        this.data = data;
+        this.nbt = nbt;
     }
 
     @Override
     public NbtObject serialize(NbtObject object) {
-        object.putAll(data);
+        object.putAll(nbt);
         return object;
     }
 
     @Override
     public void deserialize(BlockStateLike state, NbtObject object) {
-        data.putAll(object);
+        nbt.putAll(object);
     }
 
     /**
@@ -30,7 +30,7 @@ class SimpleBlockEntityImpl extends BlockEntityImpl {
      *
      * @return 所持有的NBT表。
      */
-    public NbtObject getData() {
-        return data;
+    public NbtObject getNbt() {
+        return nbt;
     }
 }

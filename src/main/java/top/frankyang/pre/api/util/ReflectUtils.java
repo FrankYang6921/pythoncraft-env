@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +27,7 @@ public final class ReflectUtils {
             add(Double.class);
             add(Void.class);
         }});
+    private static final Map<Class<?>, Set<Field>> allFields = new ConcurrentHashMap<>();
 
     static {
         try {
@@ -66,19 +68,21 @@ public final class ReflectUtils {
     }
 
     public static Set<Field> getAllFields(Class<?> c) {
-        Set<Field> set = new HashSet<>();
-        Collections.addAll(set, c.getDeclaredFields());
-        Collections.addAll(set, c.getFields());
-        if (c.getInterfaces().length != 0) {
-            for (Class<?> $interface : c.getInterfaces()) {
-                set.addAll(getAllFields($interface));
+        return allFields.computeIfAbsent(c, c0 -> {
+            Set<Field> set = new HashSet<>();
+            Collections.addAll(set, c.getDeclaredFields());
+            Collections.addAll(set, c.getFields());
+            if (c.getInterfaces().length != 0) {
+                for (Class<?> $interface : c.getInterfaces()) {
+                    set.addAll(getAllFields($interface));
+                }
             }
-        }
-        Class<?> superClass = c.getSuperclass();
-        if (superClass != null) {
-            set.addAll(getAllFields(superClass));
-        }
-        return Collections.unmodifiableSet(set);
+            Class<?> superClass = c.getSuperclass();
+            if (superClass != null) {
+                set.addAll(getAllFields(superClass));
+            }
+            return Collections.unmodifiableSet(set);
+        });
     }
 
     public static List<Field> getInstanceFields(Class<?> c) {

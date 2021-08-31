@@ -4,12 +4,12 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricMaterialBuilder;
 import net.minecraft.block.Material;
 import net.minecraft.block.piston.PistonBehavior;
 import top.frankyang.pre.api.block.color.ColorLike;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 /**
  * 包装类，包装原版类{@link Material}。
  */
-public class BlockMaterial extends DelegatedCastable<Material> {
+public class BlockMaterial extends CastableImpl<Material> {
     protected BlockMaterial(Material delegate) {
         super(delegate);
     }
@@ -24,35 +24,35 @@ public class BlockMaterial extends DelegatedCastable<Material> {
     }
 
     public boolean isLiquid() {
-        return delegate.isLiquid();
+        return casted.isLiquid();
     }
 
     public boolean isSolid() {
-        return delegate.isSolid();
+        return casted.isSolid();
     }
 
     public boolean blocksMovement() {
-        return delegate.blocksMovement();
+        return casted.blocksMovement();
     }
 
     public boolean isBurnable() {
-        return delegate.isBurnable();
+        return casted.isBurnable();
     }
 
     public boolean isReplaceable() {
-        return delegate.isReplaceable();
+        return casted.isReplaceable();
     }
 
     public boolean blocksLight() {
-        return delegate.blocksLight();
+        return casted.blocksLight();
     }
 
     public String getPistonBehavior() {
-        return delegate.getPistonBehavior().name();
+        return casted.getPistonBehavior().name();
     }
 
     public ColorLike getColor() {
-        return delegate::getColor;
+        return casted::getColor;
     }
 
     public static class Builder {

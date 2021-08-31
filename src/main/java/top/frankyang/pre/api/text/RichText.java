@@ -8,9 +8,9 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.LowercaseEnumTypeAdapterFactory;
 import net.minecraft.util.Util;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 import top.frankyang.pre.api.misc.Copyable;
-import top.frankyang.pre.api.misc.JsonCastable;
+import top.frankyang.pre.api.misc.conversion.JsonCastable;
 
 import java.util.List;
 import java.util.stream.Collectors;

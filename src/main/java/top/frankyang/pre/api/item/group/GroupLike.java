@@ -2,7 +2,7 @@ package top.frankyang.pre.api.item.group;
 
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 
 /**
  * 包装类接口，包装原版类{@link ItemGroup}。

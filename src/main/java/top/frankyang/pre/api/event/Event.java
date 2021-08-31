@@ -10,16 +10,4 @@ public interface Event {
      * @return 该事件的类型。
      */
     EventType getType();
-
-    /**
-     * 内部使用的方法，供事件源回调。
-     */
-    default void beforeListeners(EventSource<?> source) {
-    }
-
-    /**
-     * 内部使用的方法，供事件源回调。
-     */
-    default void afterListeners(EventSource<?> source) {
-    }
 }

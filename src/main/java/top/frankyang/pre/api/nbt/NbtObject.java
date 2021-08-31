@@ -8,7 +8,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.Tag;
-import top.frankyang.pre.api.misc.CastingMap;
+import top.frankyang.pre.api.misc.collection.CastingMap;
 import top.frankyang.pre.mixin.reflect.CompoundTagAccessor;
 
 import java.util.LinkedList;
@@ -84,7 +84,7 @@ public class NbtObject extends Nbt<CompoundTag> implements CastingMap<String, Ta
 
     @Override
     public Map<String, Tag> getDelegateMap() {
-        return ((CompoundTagAccessor) delegate).getTags();
+        return ((CompoundTagAccessor) casted).getTags();
     }
 
     @Override

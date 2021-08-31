@@ -3,7 +3,7 @@ package top.frankyang.pre.api.entity;
 import net.minecraft.entity.Entity;
 import top.frankyang.pre.api.block.BlockPosition;
 import top.frankyang.pre.api.math.Vector3d;
-import top.frankyang.pre.api.misc.Castable;
+import top.frankyang.pre.api.misc.conversion.Castable;
 import top.frankyang.pre.api.world.WorldImpl;
 import top.frankyang.pre.api.world.WorldLike;
 import top.frankyang.pre.mixin.reflect.EntityInvoker;

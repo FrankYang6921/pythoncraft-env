@@ -37,7 +37,7 @@ public class PythonImpl extends PythonInterpreter implements Python {
      * Removes an additional Python path from this python interpreter.
      */
     public void popPythonPath() {
-        if (pythonPathCount.get() == 0)
+        if (pythonPathCount.get() <= 0)
             return;
 
         pythonPathCount.getAndDecrement();
@@ -48,7 +48,7 @@ public class PythonImpl extends PythonInterpreter implements Python {
      * Removes all additional Python paths from this python interpreter.
      */
     public void popPythonPaths() {
-        if (pythonPathCount.get() == 0)
+        if (pythonPathCount.get() <= 0)
             return;
 
         int pathCount = pythonPathCount.get();

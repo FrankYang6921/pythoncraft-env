@@ -16,4 +16,5 @@ public enum EventType {
     BLOCK_LAND,
     BLOCK_PLACEMENT,
     ITEM_USAGE,
+    ITEM_USAGE_ON_BLOCK
 }

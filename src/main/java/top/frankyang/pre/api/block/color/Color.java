@@ -2,12 +2,12 @@ package top.frankyang.pre.api.block.color;
 
 import net.minecraft.block.MaterialColor;
 import top.frankyang.pre.api.math.RgbColor;
-import top.frankyang.pre.api.misc.DelegatedCastable;
+import top.frankyang.pre.api.misc.conversion.CastableImpl;
 
 /**
  * 包装类，包装原版类{@link MaterialColor}。
  */
-public class Color extends DelegatedCastable<MaterialColor> implements ColorLike {
+public class Color extends CastableImpl<MaterialColor> implements ColorLike {
     protected Color(MaterialColor delegate) {
         super(delegate);
     }
