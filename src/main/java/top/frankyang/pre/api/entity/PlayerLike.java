@@ -1,6 +1,7 @@
 package top.frankyang.pre.api.entity;
 
 import net.minecraft.entity.player.PlayerEntity;
+import top.frankyang.pre.api.item.ItemInstance;
 import top.frankyang.pre.mixin.reflect.HungerManagerAccessor;
 
 public interface PlayerLike<T extends PlayerEntity> extends CreatureLike<T> {

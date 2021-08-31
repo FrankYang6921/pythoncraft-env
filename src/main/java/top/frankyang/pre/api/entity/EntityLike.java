@@ -4,6 +4,8 @@ import net.minecraft.entity.Entity;
 import top.frankyang.pre.api.block.BlockPosition;
 import top.frankyang.pre.api.math.Vector3d;
 import top.frankyang.pre.api.misc.conversion.Castable;
+import top.frankyang.pre.api.text.RichText;
+import top.frankyang.pre.api.text.RichTextImpl;
 import top.frankyang.pre.api.world.WorldImpl;
 import top.frankyang.pre.api.world.WorldLike;
 import top.frankyang.pre.mixin.reflect.EntityInvoker;
@@ -20,8 +22,16 @@ public interface EntityLike<T extends Entity> extends Castable<T> {
         return cast().getEntityName();
     }
 
-    default String getFriendlyName() {
-        return cast().getName().toString();
+    default RichText getFriendlyName() {
+        return new RichTextImpl(cast().getName());
+    }
+
+    default RichText getDisplayName() {
+        return new RichTextImpl(cast().getDisplayName());
+    }
+
+    default RichText getCustomName() {
+        return new RichTextImpl(cast().getCustomName());
     }
 
     default int getOxygenLevel() {

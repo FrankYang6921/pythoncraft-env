@@ -1,7 +1,6 @@
 package top.frankyang.pre.api.item;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.util.Rarity;
 import top.frankyang.pre.api.item.food.Food;
@@ -17,8 +16,12 @@ public class ItemSettings extends CastableImpl<FabricItemSettings> {
         super(new FabricItemSettings());
     }
 
-    public ItemSettings equipmentSlot(String equipmentSlot) {
-        casted.equipmentSlot(i -> EquipmentSlot.valueOf(equipmentSlot));
+    public ItemSettings preferredArmorSlot(String armorSlot) {
+        return preferredArmorSlot(ArmorSlot.valueOf(armorSlot));
+    }
+
+    public ItemSettings preferredArmorSlot(ArmorSlot armorSlot) {
+        casted.equipmentSlot(i -> armorSlot.cast());
         return this;
     }
 
@@ -28,8 +31,7 @@ public class ItemSettings extends CastableImpl<FabricItemSettings> {
     }
 
     public ItemSettings food(Food.Builder food) {
-        casted.food(food.build().cast());
-        return this;
+        return food(food.build());
     }
 
     public ItemSettings maxCount(int maxCount) {
